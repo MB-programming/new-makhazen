@@ -46,10 +46,12 @@ if ($method === 'POST') {
         'perf_cache_api'   => 'كاش API',
         'perf_minify_html' => 'ضغط HTML',
         // Competition settings
-        'comp_active'      => 'تفعيل المسابقة',
-        'comp_title'       => 'عنوان المسابقة',
-        'comp_success_msg' => 'رسالة النجاح (تحت التهنئة)',
-        'comp_ref_prefix'  => 'بادئة رقم المرجع',
+        'comp_active'        => 'تفعيل المسابقة',
+        'comp_title'         => 'عنوان المسابقة',
+        'comp_subtitle'      => 'وصف المسابقة',
+        'comp_success_msg'   => 'رسالة النجاح (تحت التهنئة)',
+        'comp_ref_prefix'    => 'بادئة رقم المرجع',
+        'comp_slider_images' => 'صور سلايدر المسابقة (JSON)',
         // Static pages
         'page_terms'       => 'الشروط والأحكام',
         'page_privacy'     => 'سياسة الخصوصية',
@@ -66,6 +68,9 @@ if ($method === 'POST') {
             'value2'   => $value,
         ]);
     }
+
+    // Bust page cache so changes appear immediately
+    @unlink(__DIR__ . '/../cache/data/page_data.json');
 
     jsonResponse(['success' => true, 'message' => 'تم حفظ الإعدادات بنجاح']);
 }

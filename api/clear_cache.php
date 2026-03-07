@@ -45,7 +45,10 @@ $deleted = 0;
 foreach ([$cacheFile, $metaFile] as $f) {
     if (is_file($f)) { unlink($f); $deleted++; }
 }
-if ($deleted) $cleared[] = 'كاش البيانات (API)';
+// Also bust index.php page cache
+$pageDataCache = $cacheDir . 'page_data.json';
+if (is_file($pageDataCache)) { unlink($pageDataCache); $deleted++; }
+if ($deleted) $cleared[] = 'كاش البيانات (API + صفحة)';
 
 // 2. Minified CSS/JS cache
 $minifyCache = __DIR__ . '/../cache/minify/';

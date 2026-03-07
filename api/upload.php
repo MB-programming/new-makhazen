@@ -57,6 +57,10 @@ if ($type === 'cover') {
     $uploadDir = __DIR__ . '/../assets/articles/';
     $urlPrefix = 'assets/articles/';
     $prefix    = 'cover_';
+} elseif ($type === 'slider') {
+    $uploadDir = __DIR__ . '/../assets/slider/';
+    $urlPrefix = 'assets/slider/';
+    $prefix    = 'slide_';
 } else {
     $uploadDir = __DIR__ . '/../assets/brands/';
     $urlPrefix = 'assets/brands/';

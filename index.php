@@ -4,116 +4,139 @@
 // ============================================================
 require_once __DIR__ . '/api/config.php';
 
-// ── Defaults ─────────────────────────────────────────────────
-$settings   = [];
-$branches   = [];
-$brands     = [];
-$categories = [];
-$articles   = [];
-$social     = [];
-$contact    = [];
+// ── File-based cache (5-minute TTL) ──────────────────────────
+$cacheDir  = __DIR__ . '/cache/data';
+$cacheFile = $cacheDir . '/page_data.json';
+$cacheTTL  = 300; // seconds
 
-try {
-    $db = getDB();
-
-    // Settings
-    $rows = $db->query("SELECT `key`, value FROM settings")->fetchAll();
-    foreach ($rows as $r) $settings[$r['key']] = $r['value'];
-
-    // Branches
-    $branches = $db->query("
-        SELECT id, name_ar, name_en, city_ar, city_en, address_ar, address_en, phone, map_url, sort_order
-        FROM branches WHERE is_active = 1
-        ORDER BY sort_order ASC, city_ar ASC LIMIT 200
-    ")->fetchAll();
-
-    // Branch hours (one query, no N+1)
-    $hoursRows = $db->query("
-        SELECT branch_id, day_type, day_label, opens_at, closes_at, is_closed, note, sort_order
-        FROM branch_hours WHERE is_active = 1
-        ORDER BY branch_id ASC, sort_order ASC, id ASC
-    ")->fetchAll();
-    $hoursMap = [];
-    foreach ($hoursRows as $h) {
-        $hoursMap[$h['branch_id']][] = [
-            'day_type'  => $h['day_type'],
-            'day_label' => $h['day_label'],
-            'opens_at'  => substr($h['opens_at'],  0, 5),
-            'closes_at' => substr($h['closes_at'], 0, 5),
-            'is_closed' => (bool)$h['is_closed'],
-            'note'      => $h['note'],
-        ];
-    }
-    foreach ($branches as &$b) {
-        $b['working_hours'] = $hoursMap[$b['id']] ?? [];
-    }
-    unset($b);
-
-    // Categories
-    $categories = $db->query("
-        SELECT id, name_ar, slug, icon, description
-        FROM categories WHERE is_active = 1
-        ORDER BY sort_order ASC, id ASC LIMIT 200
-    ")->fetchAll();
-
-    // Brands
-    $brands = $db->query("
-        SELECT id, name_ar, name_en, logo_url, website_url, sort_order
-        FROM brands WHERE is_active = 1
-        ORDER BY sort_order ASC, name_en ASC LIMIT 200
-    ")->fetchAll();
-
-    // Social
-    $social = $db->query("
-        SELECT id, platform, platform_ar, url, username, icon, color, sort_order
-        FROM social_media WHERE is_active = 1
-        ORDER BY sort_order ASC LIMIT 50
-    ")->fetchAll();
-
-    // Contact
-    $contact = $db->query("
-        SELECT id, type, value, label_ar
-        FROM contact_info WHERE is_active = 1
-        ORDER BY sort_order ASC LIMIT 50
-    ")->fetchAll();
-
-    // Articles (separate DB, 3s timeout)
-    try {
-        $artPDO = new PDO(
-            'mysql:host=localhost;dbname=makhazenalenaya_blogs;charset=utf8mb4',
-            'makhazenalenaya_blogs',
-            '?BN0Mn5x$(K$',
-            [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES   => false,
-                PDO::ATTR_TIMEOUT            => 3,
-            ]
-        );
-        $articles = $artPDO->query("
-            SELECT id, title, slug, excerpt, cover_image, category, author_name, published_at, is_featured
-            FROM articles WHERE is_active = 1
-            ORDER BY is_featured DESC, sort_order ASC, created_at DESC LIMIT 50
-        ")->fetchAll();
-    } catch (Exception $e) {
-        $articles = [];
-    }
-
-} catch (Exception $e) {
-    // DB unavailable — JS will use fallback static data
+$pageData = null;
+if (is_file($cacheFile) && (time() - filemtime($cacheFile)) < $cacheTTL) {
+    $pageData = file_get_contents($cacheFile);
 }
 
-// ── Inline data payload ───────────────────────────────────────
-$pageData = json_encode([
-    'success'    => true,
-    'branches'   => $branches,
-    'brands'     => $brands,
-    'categories' => $categories,
-    'articles'   => $articles,
-    'social'     => $social,
-    'contact'    => $contact,
-    'settings'   => $settings,
-], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+if (!$pageData) {
+    // ── Defaults ──────────────────────────────────────────────
+    $settings   = [];
+    $branches   = [];
+    $brands     = [];
+    $categories = [];
+    $articles   = [];
+    $social     = [];
+    $contact    = [];
+
+    try {
+        $db = getDB();
+
+        // Settings
+        $rows = $db->query("SELECT `key`, value FROM settings")->fetchAll();
+        foreach ($rows as $r) $settings[$r['key']] = $r['value'];
+
+        // Branches
+        $branches = $db->query("
+            SELECT id, name_ar, name_en, city_ar, city_en, address_ar, address_en, phone, map_url, sort_order
+            FROM branches WHERE is_active = 1
+            ORDER BY sort_order ASC, city_ar ASC LIMIT 200
+        ")->fetchAll();
+
+        // Branch hours (one query, no N+1)
+        $hoursRows = $db->query("
+            SELECT branch_id, day_type, day_label, opens_at, closes_at, is_closed, note, sort_order
+            FROM branch_hours WHERE is_active = 1
+            ORDER BY branch_id ASC, sort_order ASC, id ASC
+        ")->fetchAll();
+        $hoursMap = [];
+        foreach ($hoursRows as $h) {
+            $hoursMap[$h['branch_id']][] = [
+                'day_type'  => $h['day_type'],
+                'day_label' => $h['day_label'],
+                'opens_at'  => substr($h['opens_at'],  0, 5),
+                'closes_at' => substr($h['closes_at'], 0, 5),
+                'is_closed' => (bool)$h['is_closed'],
+                'note'      => $h['note'],
+            ];
+        }
+        foreach ($branches as &$b) {
+            $b['working_hours'] = $hoursMap[$b['id']] ?? [];
+        }
+        unset($b);
+
+        // Categories
+        $categories = $db->query("
+            SELECT id, name_ar, slug, icon, description
+            FROM categories WHERE is_active = 1
+            ORDER BY sort_order ASC, id ASC LIMIT 200
+        ")->fetchAll();
+
+        // Brands
+        $brands = $db->query("
+            SELECT id, name_ar, name_en, logo_url, website_url, sort_order
+            FROM brands WHERE is_active = 1
+            ORDER BY sort_order ASC, name_en ASC LIMIT 200
+        ")->fetchAll();
+
+        // Social
+        $social = $db->query("
+            SELECT id, platform, platform_ar, url, username, icon, color, sort_order
+            FROM social_media WHERE is_active = 1
+            ORDER BY sort_order ASC LIMIT 50
+        ")->fetchAll();
+
+        // Contact
+        $contact = $db->query("
+            SELECT id, type, value, label_ar
+            FROM contact_info WHERE is_active = 1
+            ORDER BY sort_order ASC LIMIT 50
+        ")->fetchAll();
+
+        // Articles (separate DB, 3s timeout)
+        try {
+            $artPDO = new PDO(
+                'mysql:host=localhost;dbname=makhazenalenaya_blogs;charset=utf8mb4',
+                'makhazenalenaya_blogs',
+                '?BN0Mn5x$(K$',
+                [
+                    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES   => false,
+                    PDO::ATTR_TIMEOUT            => 3,
+                ]
+            );
+            $articles = $artPDO->query("
+                SELECT id, title, slug, excerpt, cover_image, category, author_name, published_at, is_featured
+                FROM articles WHERE is_active = 1
+                ORDER BY is_featured DESC, sort_order ASC, created_at DESC LIMIT 50
+            ")->fetchAll();
+        } catch (Exception $e) {
+            $articles = [];
+        }
+
+    } catch (Exception $e) {
+        // DB unavailable — JS will use fallback static data
+    }
+
+    // ── Build & cache payload ──────────────────────────────────
+    $pageData = json_encode([
+        'success'    => true,
+        'branches'   => $branches,
+        'brands'     => $brands,
+        'categories' => $categories,
+        'articles'   => $articles,
+        'social'     => $social,
+        'contact'    => $contact,
+        'settings'   => $settings,
+    ], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+
+    // Atomic write: tmp → rename (prevents partial reads)
+    if (!is_dir($cacheDir)) @mkdir($cacheDir, 0755, true);
+    $tmp = $cacheFile . '.tmp';
+    if (@file_put_contents($tmp, $pageData, LOCK_EX) !== false) {
+        @rename($tmp, $cacheFile);
+    }
+}
+
+// settings needed for header/body codes
+$_decoded   = json_decode($pageData, true);
+$settings   = $_decoded['settings'] ?? [];
 
 // ── Inline codes (no JS fetch needed) ────────────────────────
 $headerCode = $settings['header_code'] ?? '';

@@ -3,23 +3,25 @@
 require_once __DIR__ . '/../api/config.php';
 
 $comp = [
-    'title'      => 'تسجيل المسابقة',
-    'subtitle'   => 'سجّل بياناتك وكن جزءاً من المسابقة',
-    'active'     => true,
-    'ref_prefix' => 'MK',
+    'title'         => 'تسجيل المسابقة',
+    'subtitle'      => 'سجّل بياناتك وكن جزءاً من المسابقة',
+    'active'        => true,
+    'ref_prefix'    => 'MK',
+    'slider_images' => [],
 ];
 
 try {
     $db   = getDB();
     $rows = $db->query("SELECT `key`, value FROM settings WHERE `key` IN
-        ('comp_title','comp_subtitle','comp_active','comp_ref_prefix')")->fetchAll();
+        ('comp_title','comp_subtitle','comp_active','comp_ref_prefix','comp_slider_images')")->fetchAll();
     foreach ($rows as $r) {
         match ($r['key']) {
-            'comp_title'      => $comp['title']      = $r['value'],
-            'comp_subtitle'   => $comp['subtitle']   = $r['value'],
-            'comp_active'     => $comp['active']     = ($r['value'] !== '0'),
-            'comp_ref_prefix' => $comp['ref_prefix'] = $r['value'],
-            default           => null,
+            'comp_title'         => $comp['title']         = $r['value'],
+            'comp_subtitle'      => $comp['subtitle']      = $r['value'],
+            'comp_active'        => $comp['active']        = ($r['value'] !== '0'),
+            'comp_ref_prefix'    => $comp['ref_prefix']    = $r['value'],
+            'comp_slider_images' => $comp['slider_images'] = json_decode($r['value'] ?? '[]', true) ?: [],
+            default              => null,
         };
     }
 } catch (Exception $e) { /* fallback to defaults above */ }
@@ -201,6 +203,43 @@ $isActive = $comp['active'];
     .swal-ref-card .ref-val { font-weight: 700; color: #fff; margin-right: auto; }
 
     .site-footer { margin-top: 60px; }
+
+    /* ── Image Slider ─────────────────────────────────────── */
+    .comp-slider {
+      max-width: 640px; margin: 28px auto 0; padding: 0 16px;
+    }
+    .slider-track-wrap {
+      position: relative; overflow: hidden; border-radius: 16px;
+      border: 1px solid rgba(255,207,6,0.2);
+      background: #111;
+    }
+    .slider-track {
+      display: flex; transition: transform .5s ease;
+    }
+    .slider-track img {
+      min-width: 100%; width: 100%; max-height: 320px;
+      object-fit: cover; display: block; border-radius: 16px;
+    }
+    .slider-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,0.55); border: 1px solid rgba(255,207,6,0.35);
+      color: #FFCF06; width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 14px; z-index: 2;
+      transition: background .2s;
+    }
+    .slider-btn:hover { background: rgba(255,207,6,0.2); }
+    .slider-btn.prev { right: 10px; }
+    .slider-btn.next { left: 10px; }
+    .slider-dots {
+      display: flex; justify-content: center; gap: 6px; margin-top: 10px;
+    }
+    .slider-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: rgba(255,207,6,0.25); cursor: pointer;
+      transition: background .25s;
+    }
+    .slider-dot.active { background: #FFCF06; }
   </style>
 </head>
 <body>
@@ -236,6 +275,29 @@ $isActive = $comp['active'];
     <p><?= $subtitle ?></p>
   </div>
 </div>
+
+<?php if (!empty($comp['slider_images'])): ?>
+<div class="comp-slider" id="comp-slider">
+  <div class="slider-track-wrap">
+    <div class="slider-track" id="slider-track">
+      <?php foreach ($comp['slider_images'] as $img): ?>
+        <img src="<?= htmlspecialchars('../' . $img, ENT_QUOTES, 'UTF-8') ?>" alt="" loading="lazy" />
+      <?php endforeach; ?>
+    </div>
+    <?php if (count($comp['slider_images']) > 1): ?>
+    <button class="slider-btn prev" onclick="sliderMove(-1)" aria-label="السابق"><i class="fas fa-chevron-right"></i></button>
+    <button class="slider-btn next" onclick="sliderMove(1)"  aria-label="التالي"><i class="fas fa-chevron-left"></i></button>
+    <?php endif; ?>
+  </div>
+  <?php if (count($comp['slider_images']) > 1): ?>
+  <div class="slider-dots" id="slider-dots">
+    <?php foreach ($comp['slider_images'] as $i => $_): ?>
+      <div class="slider-dot<?= $i === 0 ? ' active' : '' ?>" onclick="sliderGo(<?= $i ?>)"></div>
+    <?php endforeach; ?>
+  </div>
+  <?php endif; ?>
+</div>
+<?php endif; ?>
 
 <div class="form-wrap">
 <?php if (!$isActive): ?>
@@ -335,6 +397,21 @@ $isActive = $comp['active'];
     </div>
 
     <div class="field-group">
+      <label>هل سبق تعاملت مع مخازن العناية؟ <span class="req">*</span></label>
+      <div class="gender-row">
+        <div class="gender-option">
+          <input type="radio" name="prev_customer" id="prev-yes" value="1" />
+          <label class="gender-label" for="prev-yes"><i class="fas fa-check-circle"></i> نعم</label>
+        </div>
+        <div class="gender-option">
+          <input type="radio" name="prev_customer" id="prev-no" value="0" />
+          <label class="gender-label" for="prev-no"><i class="fas fa-times-circle"></i> لا</label>
+        </div>
+      </div>
+      <div class="field-error" id="err-prev_customer"></div>
+    </div>
+
+    <div class="field-group">
       <label class="terms-wrap" for="terms">
         <input type="checkbox" id="terms" name="terms" />
         <span class="terms-text">
@@ -373,14 +450,16 @@ $isActive = $comp['active'];
 <script>
 // ── Validation ────────────────────────────────────────────
 const rules = {
-  full_name:   v => v.trim().length >= 3 || 'الاسم الكامل لا يقل عن 3 أحرف',
-  email:       v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) || 'البريد الإلكتروني غير صحيح',
-  phone:       v => /^05\d{8}$/.test(v.trim()) || 'الجوال يبدأ بـ 05 ويكون 10 أرقام',
-  national_id: v => /^[12]\d{9}$/.test(v.trim()) || 'الهوية 10 أرقام وتبدأ بـ 1 أو 2',
-  city:        v => v.trim().length > 0 || 'يرجى اختيار المدينة',
-  gender:      () => document.querySelector('input[name="gender"]:checked')?.value
-                     ? true : 'يرجى اختيار الجنس',
-  terms:       () => document.getElementById('terms').checked || 'يجب الموافقة على الشروط والأحكام',
+  full_name:     v => v.trim().length >= 3 || 'الاسم الكامل لا يقل عن 3 أحرف',
+  email:         v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) || 'البريد الإلكتروني غير صحيح',
+  phone:         v => /^05\d{8}$/.test(v.trim()) || 'الجوال يبدأ بـ 05 ويكون 10 أرقام',
+  national_id:   v => /^[12]\d{9}$/.test(v.trim()) || 'الهوية 10 أرقام وتبدأ بـ 1 أو 2',
+  city:          v => v.trim().length > 0 || 'يرجى اختيار المدينة',
+  gender:        () => document.querySelector('input[name="gender"]:checked')?.value
+                       ? true : 'يرجى اختيار الجنس',
+  prev_customer: () => document.querySelector('input[name="prev_customer"]:checked') !== null
+                       ? true : 'يرجى الإجابة على سؤال التعامل السابق مع مخازن العناية',
+  terms:         () => document.getElementById('terms').checked || 'يجب الموافقة على الشروط والأحكام',
 };
 
 function showError(field, msg) {
@@ -398,7 +477,7 @@ function showError(field, msg) {
 
 function validateAll() {
   let valid = true;
-  ['full_name','email','phone','national_id','city','gender','terms'].forEach(field => {
+  ['full_name','email','phone','national_id','city','gender','prev_customer','terms'].forEach(field => {
     const el  = document.getElementById(field);
     const res = rules[field](el ? el.value : '');
     if (res !== true) { showError(field, res); valid = false; }
@@ -414,6 +493,7 @@ function validateAll() {
   el.addEventListener('input', () => { if (el.classList.contains('error')) { const r = rules[field](el.value); if (r === true) showError(field, ''); } });
 });
 document.querySelectorAll('input[name="gender"]').forEach(r => r.addEventListener('change', () => showError('gender', '')));
+document.querySelectorAll('input[name="prev_customer"]').forEach(r => r.addEventListener('change', () => showError('prev_customer', '')));
 document.getElementById('terms').addEventListener('change', () => showError('terms', ''));
 
 document.getElementById('phone').addEventListener('input', function() {
@@ -422,6 +502,30 @@ document.getElementById('phone').addEventListener('input', function() {
 document.getElementById('national_id').addEventListener('input', function() {
   this.value = this.value.replace(/\D/g, '').slice(0, 10);
 });
+
+// ── Slider ────────────────────────────────────────────────
+(function() {
+  const track = document.getElementById('slider-track');
+  if (!track) return;
+  const slides = track.children.length;
+  if (slides <= 1) return;
+  let cur = 0, timer;
+
+  function goTo(n) {
+    cur = (n + slides) % slides;
+    track.style.transform = 'translateX(' + (cur * 100) + '%)';
+    document.querySelectorAll('.slider-dot').forEach((d, i) => d.classList.toggle('active', i === cur));
+  }
+
+  window.sliderMove = function(dir) { goTo(cur + dir); resetTimer(); };
+  window.sliderGo   = function(n)   { goTo(n);         resetTimer(); };
+
+  function resetTimer() {
+    clearInterval(timer);
+    timer = setInterval(() => goTo(cur + 1), 4500);
+  }
+  resetTimer();
+})();
 
 // ── Confetti ──────────────────────────────────────────────
 function fireConfetti() {
@@ -483,13 +587,14 @@ document.getElementById('reg-form').addEventListener('submit', async function(e)
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        full_name:   document.getElementById('full_name').value.trim(),
-        email:       document.getElementById('email').value.trim(),
-        phone:       document.getElementById('phone').value.trim(),
-        national_id: document.getElementById('national_id').value.trim(),
-        city:        document.getElementById('city').value,
-        gender:      document.querySelector('input[name="gender"]:checked')?.value,
-        terms:       document.getElementById('terms').checked,
+        full_name:     document.getElementById('full_name').value.trim(),
+        email:         document.getElementById('email').value.trim(),
+        phone:         document.getElementById('phone').value.trim(),
+        national_id:   document.getElementById('national_id').value.trim(),
+        city:          document.getElementById('city').value,
+        gender:        document.querySelector('input[name="gender"]:checked')?.value,
+        prev_customer: document.querySelector('input[name="prev_customer"]:checked')?.value === '1',
+        terms:         document.getElementById('terms').checked,
       }),
     });
     const data = await res.json();

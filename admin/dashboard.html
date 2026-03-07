@@ -770,7 +770,7 @@
         <div class="admin-section-title">إدارة المسابقة</div>
         <div class="admin-section-sub">إعدادات المسابقة ومتابعة المشاركين</div>
       </div>
-      <a href="../register.html" target="_blank" class="admin-section-link">
+      <a href="../register/" target="_blank" class="admin-section-link">
         <i class="fas fa-external-link-alt"></i> صفحة التسجيل
       </a>
     </div>
@@ -813,6 +813,14 @@
             <div class="comp-field-hint">يظهر في صفحة التسجيل ونافذة التهنئة</div>
           </div>
 
+          <!-- Subtitle -->
+          <div class="comp-field-full">
+            <div class="comp-field-label"><i class="fas fa-align-left"></i> وصف / عنوان فرعي</div>
+            <input type="text" id="comp_subtitle" class="form-input"
+                   placeholder="سجّل بياناتك وكن جزءاً من المسابقة" />
+            <div class="comp-field-hint">يظهر أسفل عنوان المسابقة في صفحة التسجيل</div>
+          </div>
+
           <!-- Success message -->
           <div class="comp-field-full">
             <div class="comp-field-label"><i class="fas fa-comment-dots"></i> رسالة التهنئة</div>
@@ -829,6 +837,25 @@
         </button>
       </div>
     </div><!-- /settings card -->
+
+    <!-- Slider Images Card -->
+    <div class="comp-card" id="slider-card">
+      <div class="comp-card-header">
+        <i class="fas fa-images"></i> صور سلايدر صفحة التسجيل
+      </div>
+      <div class="comp-card-body">
+        <div style="margin-bottom:16px">
+          <div class="comp-field-hint" style="margin-bottom:10px">
+            الصور تظهر فوق نموذج التسجيل كسلايدر تلقائي. الحد الأقصى 10 صور.
+          </div>
+          <label class="btn-save" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px">
+            <i class="fas fa-upload"></i> رفع صورة جديدة
+            <input type="file" id="slider-upload-input" accept="image/*" style="display:none" onchange="uploadSliderImage(this)" />
+          </label>
+        </div>
+        <div id="slider-preview-grid" style="display:flex;flex-wrap:wrap;gap:12px;min-height:60px"></div>
+      </div>
+    </div><!-- /slider card -->
 
     <!-- Stats -->
     <div id="comp-stats" class="comp-stats-grid"></div>
@@ -879,12 +906,13 @@
               <th>الهوية</th>
               <th>المدينة</th>
               <th>الجنس</th>
+              <th>عميل سابق</th>
               <th>تاريخ التسجيل</th>
               <th>حذف</th>
             </tr>
           </thead>
           <tbody id="comp-tbody">
-            <tr><td colspan="10" style="text-align:center;color:#888;padding:40px">
+            <tr><td colspan="11" style="text-align:center;color:#888;padding:40px">
               جارٍ التحميل...
             </td></tr>
           </tbody>
@@ -961,10 +989,14 @@ async function loadCompSettings() {
     const compActive = document.getElementById('comp_active');
     if (compActive) compActive.checked = (map['comp_active'] ?? '1') !== '0';
 
-    ['comp_title','comp_success_msg','comp_ref_prefix'].forEach(k => {
+    ['comp_title','comp_subtitle','comp_success_msg','comp_ref_prefix'].forEach(k => {
       const el = document.getElementById(k);
       if (el && map[k] !== undefined) el.value = map[k];
     });
+
+    // Load slider images
+    const imgs = JSON.parse(map['comp_slider_images'] || '[]');
+    renderSliderPreview(imgs);
   } catch(e) { console.warn('loadCompSettings error', e); }
 }
 
@@ -972,6 +1004,7 @@ async function saveCompSettings() {
   const payload = {
     comp_active:      document.getElementById('comp_active').checked ? '1' : '0',
     comp_title:       document.getElementById('comp_title').value.trim(),
+    comp_subtitle:    document.getElementById('comp_subtitle').value.trim(),
     comp_success_msg: document.getElementById('comp_success_msg').value.trim(),
     comp_ref_prefix:  document.getElementById('comp_ref_prefix').value.trim() || 'MK',
   };
@@ -1002,12 +1035,12 @@ async function loadRegistrations() {
   if (dateTo)   params.set('date_to',   dateTo);
 
   const tbody = document.getElementById('comp-tbody');
-  tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:32px;color:#888">جارٍ التحميل...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:32px;color:#888">جارٍ التحميل...</td></tr>';
 
   try {
     const res  = await fetch('../api/registration.php?' + params.toString());
     const data = await res.json();
-    if (!data.success) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:24px;color:#f55">خطأ في تحميل البيانات</td></tr>'; return; }
+    if (!data.success) { tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:24px;color:#f55">خطأ في تحميل البيانات</td></tr>'; return; }
 
     renderCompStats(data.stats);
     renderCompTable(data.rows);
@@ -1017,7 +1050,7 @@ async function loadRegistrations() {
     const badge = document.getElementById('badge-competition');
     if (badge) badge.textContent = data.stats.total;
   } catch(e) {
-    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:24px;color:#f55">تعذّر الاتصال بالخادم</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:24px;color:#f55">تعذّر الاتصال بالخادم</td></tr>';
   }
 }
 
@@ -1054,7 +1087,7 @@ function renderCompStats(stats) {
 function renderCompTable(rows) {
   const tbody = document.getElementById('comp-tbody');
   if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:32px;color:#888">لا توجد بيانات بهذه الفلاتر</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:32px;color:#888">لا توجد بيانات بهذه الفلاتر</td></tr>';
     return;
   }
   tbody.innerHTML = rows.map((r, i) => `
@@ -1071,6 +1104,11 @@ function renderCompTable(rows) {
               style="${r.gender==='female'?'background:rgba(247,166,210,0.12);color:#f7a6d2;':''}">
           ${r.gender === 'male' ? 'ذكر' : 'أنثى'}
         </span>
+      </td>
+      <td style="text-align:center">
+        ${r.prev_customer == 1
+          ? '<span style="color:#4caf50;font-weight:700">نعم</span>'
+          : '<span style="color:#aaa">لا</span>'}
       </td>
       <td style="font-size:13px;color:#aaa;white-space:nowrap">${esc(r.created_at?.slice(0,16) || '')}</td>
       <td>
@@ -1121,6 +1159,64 @@ function esc(str) {
   return String(str ?? '')
     .replace(/&/g,'&amp;').replace(/</g,'&lt;')
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Slider Images Management ──────────────────────────────
+let sliderImages = [];
+
+function renderSliderPreview(imgs) {
+  sliderImages = imgs || [];
+  const grid = document.getElementById('slider-preview-grid');
+  if (!grid) return;
+  if (!sliderImages.length) {
+    grid.innerHTML = '<p style="color:#888;font-size:13px;padding:8px 0">لا توجد صور حالياً</p>';
+    return;
+  }
+  grid.innerHTML = sliderImages.map((url, i) => `
+    <div style="position:relative;width:140px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,207,6,0.2)">
+      <img src="../${esc(url)}" style="width:140px;height:90px;object-fit:cover;display:block" loading="lazy" />
+      <button onclick="deleteSliderImage(${i})" title="حذف"
+        style="position:absolute;top:4px;left:4px;background:rgba(255,60,60,0.85);border:none;
+               color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>`).join('');
+}
+
+async function uploadSliderImage(input) {
+  if (!input.files.length) return;
+  if (sliderImages.length >= 10) { showToast('الحد الأقصى 10 صور', false); return; }
+  const formData = new FormData();
+  formData.append('logo', input.files[0]);
+  input.value = '';
+  showToast('جارٍ رفع الصورة...');
+  try {
+    const res  = await fetch('../api/upload.php?type=slider', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (!data.success) { showToast(data.message || 'فشل الرفع', false); return; }
+    sliderImages.push(data.url);
+    await saveSliderImages();
+    renderSliderPreview(sliderImages);
+    showToast('تم رفع الصورة ✓');
+  } catch { showToast('خطأ في الاتصال', false); }
+}
+
+async function deleteSliderImage(idx) {
+  if (!confirm('حذف هذه الصورة من السلايدر؟')) return;
+  sliderImages.splice(idx, 1);
+  await saveSliderImages();
+  renderSliderPreview(sliderImages);
+  showToast('تم حذف الصورة ✓');
+}
+
+async function saveSliderImages() {
+  try {
+    await fetch('../api/settings.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ comp_slider_images: JSON.stringify(sliderImages) }),
+    });
+  } catch { showToast('خطأ في حفظ الصور', false); }
 }
 
 // ── Pages (Terms & Privacy) ───────────────────────────────
