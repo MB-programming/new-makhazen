@@ -792,33 +792,64 @@ function initCatSlider(autoplay, speed) {
 }
 
 // ============================================================
-// FETCH DATA FROM API
+// REALTIME DATA LISTENER — Server-Sent Events (SSE)
 // ============================================================
-async function loadData() {
-  try {
-    const res  = await fetch('api/get_data.php');
-    const data = await res.json();
+function applyData(data) {
+  if (!data.success) return;
+  const s       = data.settings || {};
+  const useGSAP = s.perf_animations !== '0';
+  if (!useGSAP) document.body.classList.add('css-anim');
 
-    if (data.success) {
-      const s = data.settings || {};
-      // GSAP toggle: '0' = CSS-only mode
-      const useGSAP = s.perf_animations !== '0';
-      if (!useGSAP) document.body.classList.add('css-anim');
+  renderSocial(data.social || [], useGSAP);
+  renderBranches(data.branches || [], useGSAP);
+  renderContact(data.contact || [], useGSAP);
+  renderCategories(data.categories || [], s);
+  renderBrands(data.brands || [], useGSAP);
+  renderArticles(data.articles || []);
+}
 
-      renderSocial(data.social || [], useGSAP);
-      renderBranches(data.branches || [], useGSAP);
-      renderContact(data.contact || [], useGSAP);
-      renderCategories(data.categories || [], s);
-      renderBrands(data.brands || [], useGSAP);
-      renderArticles(data.articles || []);
-    } else {
-      console.warn('API returned error, using fallback');
+function loadData() {
+  // SSE not supported — fall back to a regular fetch
+  if (typeof EventSource === 'undefined') {
+    fetch('api/get_data.php')
+      .then(r => r.json())
+      .then(data => { if (data.success) applyData(data); else loadFallbackData(); })
+      .catch(() => loadFallbackData());
+    return;
+  }
+
+  const es = new EventSource('api/stream.php');
+  let   rendered = false;
+
+  // Server pushed fresh site data
+  es.addEventListener('data', (e) => {
+    try {
+      const data = JSON.parse(e.data);
+      applyData(data);
+      rendered = true;
+    } catch (_) { /* malformed payload — ignore */ }
+  });
+
+  // Server asks us to reconnect (graceful restart after maxRuntime)
+  es.addEventListener('ping', (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.reconnect) {
+        es.close();
+        loadData();   // reopen the stream
+      }
+    } catch (_) {}
+  });
+
+  es.onerror = () => {
+    es.close();
+    if (!rendered) {
+      // First load failed — show fallback immediately, then retry SSE
       loadFallbackData();
     }
-  } catch (err) {
-    console.warn('API unavailable, using fallback data');
-    loadFallbackData();
-  }
+    // EventSource retries automatically; give server 5 s to recover
+    setTimeout(loadData, 5000);
+  };
 }
 
 // ============================================================
