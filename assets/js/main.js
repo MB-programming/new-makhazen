@@ -809,47 +809,14 @@ function applyData(data) {
 }
 
 function loadData() {
-  // SSE not supported — fall back to a regular fetch
-  if (typeof EventSource === 'undefined') {
-    fetch('api/get_data.php')
-      .then(r => r.json())
-      .then(data => { if (data.success) applyData(data); else loadFallbackData(); })
-      .catch(() => loadFallbackData());
+  // Data injected by PHP (index.php) — zero network requests
+  if (window.__DATA__) {
+    applyData(window.__DATA__);
     return;
   }
 
-  const es = new EventSource('api/stream.php');
-  let   rendered = false;
-
-  // Server pushed fresh site data
-  es.addEventListener('data', (e) => {
-    try {
-      const data = JSON.parse(e.data);
-      applyData(data);
-      rendered = true;
-    } catch (_) { /* malformed payload — ignore */ }
-  });
-
-  // Server asks us to reconnect (graceful restart after maxRuntime)
-  es.addEventListener('ping', (e) => {
-    try {
-      const msg = JSON.parse(e.data);
-      if (msg.reconnect) {
-        es.close();
-        loadData();   // reopen the stream
-      }
-    } catch (_) {}
-  });
-
-  es.onerror = () => {
-    es.close();
-    if (!rendered) {
-      // First load failed — show fallback immediately, then retry SSE
-      loadFallbackData();
-    }
-    // EventSource retries automatically; give server 5 s to recover
-    setTimeout(loadData, 5000);
-  };
+  // Fallback: opened as plain HTML or PHP unavailable
+  loadFallbackData();
 }
 
 // ============================================================
