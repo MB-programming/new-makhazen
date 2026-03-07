@@ -1,0 +1,12 @@
+DirectoryIndex index.php index.html
+
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Serve index.php for root requests
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^$ index.php [L]
+</IfModule>
