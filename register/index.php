@@ -339,7 +339,7 @@ $isActive = $comp['active'];
         <input type="checkbox" id="terms" name="terms" />
         <span class="terms-text">
           أوافق على
-          <a href="../terms.html" target="_blank">الشروط والأحكام</a>
+          <a href="../terms.php" target="_blank">الشروط والأحكام</a>
           و
           <a href="../privacy.html" target="_blank">سياسة الخصوصية</a>
           واستقبال العروض والرسائل التسويقية
