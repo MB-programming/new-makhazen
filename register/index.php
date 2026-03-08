@@ -87,6 +87,7 @@ $isActive = $comp['active'];
       border-radius: 14px;
       max-width: 560px; margin-left: auto; margin-right: auto;
       box-shadow: 0 4px 32px rgba(0,0,0,0.5);
+      direction: ltr;
     }
     .hero-slider-track { display: flex; transition: transform .5s ease; }
     .hero-slider-track img {
@@ -259,11 +260,11 @@ $isActive = $comp['active'];
 
 <header id="site-header" class="site-header visible scrolled">
   <div class="header-inner">
-    <a href="../index.html" class="header-logo">
+    <a href="../index.php" class="header-logo">
       <img src="../logob.webp" alt="مخازن العناية" />
     </a>
     <nav class="header-nav">
-      <a href="../index.html" style="font-size:18px;">الرئيسية</a>
+      <a href="../index.php" style="font-size:18px;">الرئيسية</a>
       <a href="https://wa.me/966920029921"
          style="padding: 0px; margin-bottom: -6px; font-size: 19px">
         <i class="fa-brands fa-whatsapp"></i>
@@ -554,7 +555,7 @@ document.getElementById('national_id').addEventListener('input', function() {
 
   function goTo(n) {
     cur = (n + total) % total;
-    track.style.transform = 'translateX(' + (cur * 100) + '%)';
+    track.style.transform = 'translateX(' + (-cur * 100 / total) + '%)';
     dotsEl.querySelectorAll('.hero-slider-dot')
           .forEach((d, i) => d.classList.toggle('active', i === cur));
   }

@@ -168,14 +168,14 @@ $canonical = 'https://' . ($_SERVER['HTTP_HOST'] ?? '') . '/category.php?slug=' 
 <!-- Header -->
 <header class="site-header visible scrolled" id="site-header">
   <div class="container header-inner">
-    <a href="index.html" class="header-logo">
+    <a href="index.php" class="header-logo">
       <img src="logob.webp" alt="مخازن العناية" />
     </a>
     <nav class="header-nav">
-      <a href="index.html">الرئيسية</a>
-      <a href="index.html#branches">الفروع</a>
-      <a href="index.html#brands">البراندات</a>
-      <a href="index.html#contact">تواصل معنا</a>
+      <a href="index.php">الرئيسية</a>
+      <a href="index.php#branches">الفروع</a>
+      <a href="index.php#brands">البراندات</a>
+      <a href="index.php#contact">تواصل معنا</a>
     </nav>
   </div>
 </header>
@@ -206,7 +206,7 @@ $canonical = 'https://' . ($_SERVER['HTTP_HOST'] ?? '') . '/category.php?slug=' 
 <?php if (!empty($category['body'])): ?>
 <section class="cat-body-section">
   <div class="container">
-    <a href="index.html#categories" class="back-btn">
+    <a href="index.php#categories" class="back-btn">
       <i class="fas fa-arrow-right"></i> العودة للأقسام
     </a>
     <div class="cat-body-content">
@@ -217,7 +217,7 @@ $canonical = 'https://' . ($_SERVER['HTTP_HOST'] ?? '') . '/category.php?slug=' 
 <?php else: ?>
 <section class="cat-body-section">
   <div class="container">
-    <a href="index.html#categories" class="back-btn">
+    <a href="index.php#categories" class="back-btn">
       <i class="fas fa-arrow-right"></i> العودة للأقسام
     </a>
   </div>
@@ -229,7 +229,7 @@ $canonical = 'https://' . ($_SERVER['HTTP_HOST'] ?? '') . '/category.php?slug=' 
 <div class="not-found-wrap">
   <i class="fas fa-box-open"></i>
   <h2>القسم غير موجود</h2>
-  <p>تأكد من الرابط أو عد إلى <a href="index.html">الصفحة الرئيسية</a></p>
+  <p>تأكد من الرابط أو عد إلى <a href="index.php">الصفحة الرئيسية</a></p>
 </div>
 
 <?php endif; ?>
