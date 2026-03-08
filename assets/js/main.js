@@ -5,8 +5,10 @@
 
 "use strict";
 
-// ---- GSAP Setup ----
-gsap.registerPlugin(ScrollTrigger);
+// ---- GSAP Setup (conditional — loaded only when perf_animations is on) ----
+if (typeof gsap !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 // ============================================================
 // FLOATING PARTICLES
@@ -979,13 +981,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // Only run homepage-specific code when the preloader exists
   if (!document.getElementById('preloader')) return;
 
-  initParticles();
-
-  runPreloader(() => {
-    heroEntrance();
-    initHeader();
-    initSectionAnimations();
-    initParallax();
+  if (typeof gsap !== 'undefined') {
+    // Full animated experience
+    initParticles();
+    runPreloader(() => {
+      heroEntrance();
+      initHeader();
+      initSectionAnimations();
+      initParallax();
+      loadData();
+    });
+  } else {
+    // No GSAP — skip animations, hide preloader instantly, load data
+    const preloader = document.getElementById('preloader');
+    if (preloader) preloader.style.display = 'none';
     loadData();
-  });
+  }
 });
