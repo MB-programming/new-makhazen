@@ -201,8 +201,7 @@ $bodyCode   = $settings['body_code']   ?? '';
       <div class="hero-pattern-top">
         <img src="api/img.php?src=pattern-1.webp&w=1440" alt="" aria-hidden="true" width="1440" height="400" fetchpriority="high" />
       </div>
-      <div class="hero-particles" id="hero-particles"></div>
-      <div class="hero-content">
+<div class="hero-content">
         <div class="hero-logo-wrap" id="hero-logo">
           <img src="logob.webp" alt="مخازن العناية" class="hero-logo-img" fetchpriority="high" width="260" height="120" />
         </div>
