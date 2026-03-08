@@ -3,25 +3,23 @@
 require_once __DIR__ . '/../api/config.php';
 
 $comp = [
-    'title'         => 'تسجيل المسابقة',
-    'subtitle'      => 'سجّل بياناتك وكن جزءاً من المسابقة',
-    'active'        => true,
-    'ref_prefix'    => 'MK',
-    'slider_images' => [],
+    'title'      => 'تسجيل المسابقة',
+    'subtitle'   => 'سجّل بياناتك وكن جزءاً من المسابقة',
+    'active'     => true,
+    'ref_prefix' => 'MK',
 ];
 
 try {
     $db   = getDB();
     $rows = $db->query("SELECT `key`, value FROM settings WHERE `key` IN
-        ('comp_title','comp_subtitle','comp_active','comp_ref_prefix','comp_slider_images')")->fetchAll();
+        ('comp_title','comp_subtitle','comp_active','comp_ref_prefix')")->fetchAll();
     foreach ($rows as $r) {
         match ($r['key']) {
-            'comp_title'         => $comp['title']         = $r['value'],
-            'comp_subtitle'      => $comp['subtitle']      = $r['value'],
-            'comp_active'        => $comp['active']        = ($r['value'] !== '0'),
-            'comp_ref_prefix'    => $comp['ref_prefix']    = $r['value'],
-            'comp_slider_images' => $comp['slider_images'] = json_decode($r['value'] ?? '[]', true) ?: [],
-            default              => null,
+            'comp_title'      => $comp['title']      = $r['value'],
+            'comp_subtitle'   => $comp['subtitle']   = $r['value'],
+            'comp_active'     => $comp['active']      = ($r['value'] !== '0'),
+            'comp_ref_prefix' => $comp['ref_prefix']  = $r['value'],
+            default           => null,
         };
     }
 } catch (Exception $e) { /* fallback to defaults above */ }
@@ -266,26 +264,37 @@ $isActive = $comp['active'];
   </div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
-    <?php if (!empty($comp['slider_images'])): ?>
+
+    <!-- ════════════════════════════════════════════════════
+         سلايدر الصور — أضف أو احذف <img> حسب ما تريد
+         ════════════════════════════════════════════════════ -->
     <div class="hero-slider-wrap">
       <div class="hero-slider-track" id="slider-track">
-        <?php foreach ($comp['slider_images'] as $img): ?>
-          <img src="<?= htmlspecialchars('../' . $img, ENT_QUOTES, 'UTF-8') ?>" alt="" loading="lazy" />
-        <?php endforeach; ?>
+
+        <!-- صورة 1 — غيّر الـ src بمسار صورتك -->
+        <img src="../assets/slider/slide_1.webp" alt="" loading="eager" />
+
+        <!-- صورة 2 -->
+        <img src="../assets/slider/slide_2.webp" alt="" loading="lazy" />
+
+        <!-- صورة 3 -->
+        <img src="../assets/slider/slide_3.webp" alt="" loading="lazy" />
+
+        <!-- لإضافة صورة جديدة انسخ السطر ↓ والصقه هنا وغيّر المسار
+        <img src="../assets/slider/slide_X.webp" alt="" loading="lazy" />
+        -->
+
       </div>
-      <?php if (count($comp['slider_images']) > 1): ?>
-      <button class="hero-slider-btn prev" onclick="sliderMove(-1)" aria-label="السابق"><i class="fas fa-chevron-right"></i></button>
-      <button class="hero-slider-btn next" onclick="sliderMove(1)"  aria-label="التالي"><i class="fas fa-chevron-left"></i></button>
-      <div class="hero-slider-dots" id="slider-dots">
-        <?php foreach ($comp['slider_images'] as $i => $_): ?>
-          <div class="hero-slider-dot<?= $i === 0 ? ' active' : '' ?>" onclick="sliderGo(<?= $i ?>)"></div>
-        <?php endforeach; ?>
-      </div>
-      <?php endif; ?>
+
+      <!-- أزرار التنقل (تظهر تلقائياً إذا أكثر من صورة) -->
+      <button class="hero-slider-btn prev" id="sl-prev" aria-label="السابق"><i class="fas fa-chevron-right"></i></button>
+      <button class="hero-slider-btn next" id="sl-next" aria-label="التالي"><i class="fas fa-chevron-left"></i></button>
+
+      <!-- نقاط التنقل (تُنشأ تلقائياً من JS) -->
+      <div class="hero-slider-dots" id="slider-dots"></div>
     </div>
-    <?php else: ?>
-    <span class="trophy"><i class="fas fa-trophy"></i></span>
-    <?php endif; ?>
+    <!-- ══════════════════════════════════════════════════ -->
+
     <h1><?= $title ?></h1>
     <p><?= $subtitle ?></p>
   </div>
@@ -496,26 +505,57 @@ document.getElementById('national_id').addEventListener('input', function() {
 });
 
 // ── Slider ────────────────────────────────────────────────
-(function() {
-  const track = document.getElementById('slider-track');
+(function () {
+  const track  = document.getElementById('slider-track');
+  const dotsEl = document.getElementById('slider-dots');
+  const btnP   = document.getElementById('sl-prev');
+  const btnN   = document.getElementById('sl-next');
   if (!track) return;
-  const slides = track.children.length;
-  if (slides <= 1) return;
-  let cur = 0, timer;
 
-  function goTo(n) {
-    cur = (n + slides) % slides;
-    track.style.transform = 'translateX(' + (cur * 100) + '%)';
-    document.querySelectorAll('.hero-slider-dot').forEach((d, i) => d.classList.toggle('active', i === cur));
+  // فلتر عناصر الصور فقط (يتجاهل text nodes وcomments)
+  const slides = Array.from(track.children).filter(el => el.tagName === 'IMG');
+  const total  = slides.length;
+
+  // صورة واحدة → إخفاء الأزرار والنقاط
+  if (total <= 1) {
+    if (btnP) btnP.style.display = 'none';
+    if (btnN) btnN.style.display = 'none';
+    return;
   }
 
-  window.sliderMove = function(dir) { goTo(cur + dir); resetTimer(); };
-  window.sliderGo   = function(n)   { goTo(n);         resetTimer(); };
+  let cur = 0, timer;
+
+  // أنشئ نقاط التنقل تلقائياً
+  slides.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'hero-slider-dot' + (i === 0 ? ' active' : '');
+    dot.addEventListener('click', () => { goTo(i); resetTimer(); });
+    dotsEl.appendChild(dot);
+  });
+
+  function goTo(n) {
+    cur = (n + total) % total;
+    track.style.transform = 'translateX(' + (cur * 100) + '%)';
+    dotsEl.querySelectorAll('.hero-slider-dot')
+          .forEach((d, i) => d.classList.toggle('active', i === cur));
+  }
 
   function resetTimer() {
     clearInterval(timer);
     timer = setInterval(() => goTo(cur + 1), 4500);
   }
+
+  if (btnP) btnP.addEventListener('click', () => { goTo(cur - 1); resetTimer(); });
+  if (btnN) btnN.addEventListener('click', () => { goTo(cur + 1); resetTimer(); });
+
+  // Swipe على الموبايل
+  let touchX = 0;
+  track.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  track.addEventListener('touchend',   e => {
+    const diff = touchX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) { goTo(cur + (diff > 0 ? 1 : -1)); resetTimer(); }
+  }, { passive: true });
+
   resetTimer();
 })();
 
