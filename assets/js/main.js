@@ -1,119 +1,16 @@
 /* ============================================================
    Makhazen Alenayah - Main JS
-   GSAP Animations + Data Rendering
+   CSS Animations + Data Rendering
 ============================================================ */
 
 "use strict";
 
-// ---- GSAP Setup ----
-gsap.registerPlugin(ScrollTrigger);
-
 // ============================================================
-// FLOATING PARTICLES
-// ============================================================
-function initParticles() {
-  const container = document.getElementById('hero-particles');
-  if (!container) return;
-  const count = window.innerWidth < 600 ? 12 : 25;
-
-  for (let i = 0; i < count; i++) {
-    const dot = document.createElement('div');
-    dot.style.cssText = `
-      position: absolute;
-      border-radius: 50%;
-      pointer-events: none;
-    `;
-
-    const size   = Math.random() * 4 + 1;
-    const x      = Math.random() * 100;
-    const y      = Math.random() * 100;
-    const isGold = Math.random() > 0.6;
-
-    dot.style.width  = size + 'px';
-    dot.style.height = size + 'px';
-    dot.style.left   = x + '%';
-    dot.style.top    = y + '%';
-    dot.style.background = isGold
-      ? `rgba(255, 207, 6, ${Math.random() * 0.6 + 0.1})`
-      : `rgba(255, 255, 255, ${Math.random() * 0.15 + 0.03})`;
-
-    container.appendChild(dot);
-
-    gsap.to(dot, {
-      y: (Math.random() - 0.5) * 80,
-      x: (Math.random() - 0.5) * 40,
-      opacity: Math.random() * 0.8 + 0.1,
-      duration: Math.random() * 5 + 4,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut',
-      delay: Math.random() * 4,
-    });
-  }
-}
-
-// ============================================================
-// PRELOADER ANIMATION
-// ============================================================
-function runPreloader(onComplete) {
-  const tl = gsap.timeline({ onComplete });
-
-  tl
-    .to('.preloader-logo', {
-      opacity: 1, scale: 1,
-      duration: 0.4,
-      ease: 'power3.out',
-    })
-    .to('.preloader-dots span', {
-      opacity: 1,
-      stagger: { each: 0.1, repeat: 1, yoyo: true },
-      duration: 0.15,
-    }, '-=0.1')
-    .to('.preloader', {
-      opacity: 0,
-      duration: 0.3,
-      ease: 'power2.inOut',
-    }, '+=0.1')
-    .set('.preloader', { display: 'none' });
-}
-
-// ============================================================
-// HERO ENTRANCE
+// HERO ENTRANCE — CSS transitions via class toggle
 // ============================================================
 function heroEntrance() {
-  const tl = gsap.timeline();
-
-  gsap.to('.site-header', { y: 0, duration: 0.8, ease: 'power3.out' });
-  document.getElementById('site-header').classList.add('visible');
-
-  // hero-pattern-top/bottom: opacity starts at 1 in CSS (LCP fix — no animation needed)
-
-  tl.to('#hero-logo', {
-    opacity: 1,
-    scale: 1,
-    duration: 1.2,
-    ease: 'power4.out',
-  }, 0.2)
-
-  .to('.hero-tagline', {
-    opacity: 1,
-    y: 0,
-    duration: 0.9,
-    ease: 'power3.out',
-  }, 0.7)
-
-  .to('.hero-stats', {
-    opacity: 1,
-    y: 0,
-    duration: 0.8,
-    ease: 'power3.out',
-  }, 1.0)
-
-  .to('#scroll-hint', {
-    opacity: 1,
-    duration: 0.8,
-    ease: 'power2.out',
-  }, 1.3);
+  document.getElementById('site-header')?.classList.add('visible');
+  document.body.classList.add('css-anim');
 }
 
 // ============================================================
@@ -121,123 +18,48 @@ function heroEntrance() {
 // ============================================================
 function initHeader() {
   const header = document.getElementById('site-header');
-  ScrollTrigger.create({
-    start: 'top -80',
-    onUpdate: (self) => {
-      if (self.progress > 0) {
-        header.classList.add('scrolled');
-      } else {
-        header.classList.remove('scrolled');
-      }
-    },
-  });
+
+  window.addEventListener('scroll', () => {
+    header?.classList.toggle('scrolled', window.scrollY > 80);
+  }, { passive: true });
 
   document.querySelectorAll('a[href^="#"]').forEach(link => {
     link.addEventListener('click', (e) => {
-      e.preventDefault();
       const target = document.querySelector(link.getAttribute('href'));
       if (target) {
-        gsap.to(window, {
-          scrollTo: { y: target, offsetY: 60 },
-          duration: 1.0,
-          ease: 'power3.inOut',
-        });
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
   });
 }
 
 // ============================================================
-// SOCIAL SECTION ANIMATION
+// INTERSECTION OBSERVER — fade-in on scroll
 // ============================================================
-function animateSocial() {
-  gsap.to('.social-card', {
-    scrollTrigger: {
-      trigger: '.social-section',
-      start: 'top 80%',
-    },
-    opacity: 1,
-    y: 0,
-    stagger: 0.1,
-    duration: 0.7,
-    ease: 'power3.out',
-  });
+function observeFadeIn(selector) {
+  const io = new IntersectionObserver((entries, obs) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'none';
+        }, i * 60);
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll(selector).forEach(el => io.observe(el));
 }
 
 // ============================================================
-// BRANCHES SECTION ANIMATION
+// RENDER SOCIAL CARDS
 // ============================================================
-function animateBranches() {
-  ScrollTrigger.create({
-    trigger: '.branches-section',
-    start: 'top 75%',
-    onEnter: () => {
-      gsap.to('.branches-section .branch-card:not(.hidden)', {
-        opacity: 1,
-        y: 0,
-        stagger: 0.06,
-        duration: 0.7,
-        ease: 'power3.out',
-      });
-    },
-  });
-}
-
-// ============================================================
-// CONTACT SECTION ANIMATION
-// ============================================================
-function animateContact() {
-  gsap.to('.contact-card', {
-    scrollTrigger: {
-      trigger: '.contact-section',
-      start: 'top 75%',
-    },
-    opacity: 1,
-    scale: 1,
-    duration: 0.9,
-    ease: 'back.out(1.5)',
-  });
-
-  gsap.to('.contact-icon-wrap', {
-    boxShadow: '0 0 30px rgba(255,207,6,0.35)',
-    repeat: -1,
-    yoyo: true,
-    duration: 2,
-    ease: 'sine.inOut',
-  });
-}
-
-// ============================================================
-// BRANDS SECTION ANIMATION
-// ============================================================
-function animateBrands() {
-  ScrollTrigger.create({
-    trigger: '.brands-section',
-    start: 'top 80%',
-    onEnter: () => {
-      gsap.to('.brand-card', {
-        opacity: 1,
-        scale: 1,
-        stagger: {
-          each: 0.04,
-          from: 'start',
-          grid: 'auto',
-        },
-        duration: 0.5,
-        ease: 'back.out(1.7)',
-      });
-    },
-  });
-}
-
-// ============================================================
-// RENDER SOCIAL CARDS — يستخدم اللون من لوحة التحكم (DB)
-// ============================================================
-function renderSocial(items, useGSAP = true) {
+function renderSocial(items) {
   const grid = document.getElementById('social-grid');
   grid.innerHTML = '';
 
-  // ألوان افتراضية fallback
   const defaultColors = {
     instagram: { bg: 'rgba(225,48,108,0.1)',  icon: '#E1306C', border: 'rgba(225,48,108,0.25)' },
     tiktok:    { bg: 'rgba(0,0,0,0.07)',       icon: '#000000', border: 'rgba(0,0,0,0.15)'      },
@@ -248,7 +70,6 @@ function renderSocial(items, useGSAP = true) {
     facebook:  { bg: 'rgba(24,119,242,0.1)',   icon: '#1877F2', border: 'rgba(24,119,242,0.25)' },
   };
 
-  // hex → rgba
   function hexToRgba(hex, alpha) {
     if (!hex || hex.length < 7) return null;
     const r = parseInt(hex.slice(1,3), 16);
@@ -257,7 +78,6 @@ function renderSocial(items, useGSAP = true) {
     return `rgba(${r},${g},${b},${alpha})`;
   }
 
-  // منصات لازم يتغير لونها حتى لو اللون الأصلي فاتح
   const forceDarkIcon = ['snapchat', 'tiktok', 'twitter'];
 
   items.forEach((item) => {
@@ -268,7 +88,6 @@ function renderSocial(items, useGSAP = true) {
     let colors;
 
     if (dbColor && dbColor.toLowerCase() !== '#ffffff' && dbColor.toLowerCase() !== '#fff') {
-      // لون من لوحة التحكم
       const iconColor = forceDarkIcon.includes(platform)
         ? (fallback?.icon || '#000000')
         : dbColor;
@@ -280,7 +99,6 @@ function renderSocial(items, useGSAP = true) {
     } else if (fallback) {
       colors = fallback;
     } else {
-      // منصة جديدة غير موجودة
       const c = dbColor || '#FFCF06';
       colors = { icon: c, bg: hexToRgba(c, 0.1) || 'rgba(255,207,6,0.1)', border: hexToRgba(c, 0.25) || 'rgba(255,207,6,0.2)' };
     }
@@ -305,7 +123,7 @@ function renderSocial(items, useGSAP = true) {
     grid.appendChild(card);
   });
 
-  if (useGSAP) animateSocial();
+  observeFadeIn('.social-card');
 }
 
 // ============================================================
@@ -314,7 +132,6 @@ function renderSocial(items, useGSAP = true) {
 function buildHoursHtml(hours) {
   if (!hours || hours.length === 0) return '';
 
-  // التسميات الافتراضية حسب day_type
   const defaultLabels = {
     all:      'يومياً',
     weekdays: 'السبت - الخميس',
@@ -334,7 +151,6 @@ function buildHoursHtml(hours) {
         </div>`;
     }
 
-    // تحويل HH:MM إلى 12h عربي
     const fmt = t => {
       if (!t) return '';
       const [hh, mm] = t.split(':').map(Number);
@@ -361,14 +177,13 @@ function buildHoursHtml(hours) {
 }
 
 // ============================================================
-// RENDER BRANCHES  (مع عرض 5 في البداية + زرار عرض المزيد)
+// RENDER BRANCHES
 // ============================================================
-function renderBranches(branches, useGSAP = true) {
+function renderBranches(branches) {
   const grid       = document.getElementById('branches-grid');
   const filterWrap = document.getElementById('city-filter');
   grid.innerHTML   = '';
 
-  // ---- بناء قائمة المدن مع الرياض أولاً ----
   const cities = [];
   branches.forEach(b => {
     if (b.city_ar && !cities.find(c => c.ar === b.city_ar)) {
@@ -388,7 +203,6 @@ function renderBranches(branches, useGSAP = true) {
     filterWrap.appendChild(btn);
   });
 
-  // ---- ترتيب الرياض بترتيب محدد ثم الباقي ----
   const riyadhOrder = ['الياسمين', 'الدائري', 'الحمراء', 'الربيع', 'المحمدية'];
 
   const riyadhBranches = riyadhOrder
@@ -405,7 +219,6 @@ function renderBranches(branches, useGSAP = true) {
     ...branches.filter(b => b.city_ar !== 'الرياض'),
   ];
 
-  // ---- رسم كروت الفروع ----
   sortedBranches.forEach(branch => {
     const card = document.createElement('div');
     card.className    = 'branch-card';
@@ -442,7 +255,6 @@ function renderBranches(branches, useGSAP = true) {
     grid.appendChild(card);
   });
 
-  // ---- منطق عرض المزيد ----
   const STEP = 6;
   let visibleCount = STEP;
 
@@ -452,15 +264,12 @@ function renderBranches(branches, useGSAP = true) {
       filterCity === 'all' || c.dataset.city === filterCity
     );
 
-    // إخفاء الكل أولاً
     allCards.forEach(c => c.classList.add('hidden'));
 
-    // إظهار بقدر visibleCount
     filtered.forEach((c, i) => {
       if (i < visibleCount) c.classList.remove('hidden');
     });
 
-    // زرار عرض المزيد
     let showMoreBtn = document.getElementById('show-more-branches');
 
     if (filtered.length > visibleCount) {
@@ -475,13 +284,7 @@ function renderBranches(branches, useGSAP = true) {
           visibleCount += STEP;
           const activeCity = filterWrap.querySelector('.city-btn.active')?.dataset.city || 'all';
           applyVisibility(activeCity);
-
-          // أنيميشن للكروت الجديدة
-          gsap.fromTo(
-            grid.querySelectorAll('.branch-card:not(.hidden)'),
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, stagger: 0.05, duration: 0.5, ease: 'power3.out' }
-          );
+          observeFadeIn('.branch-card:not(.hidden)');
         });
       }
       showMoreBtn.style.display = 'flex';
@@ -490,10 +293,8 @@ function renderBranches(branches, useGSAP = true) {
     }
   }
 
-  // تطبيق الأولي
   applyVisibility('all');
 
-  // ---- فلتر المدن ----
   filterWrap.addEventListener('click', (e) => {
     const btn = e.target.closest('.city-btn');
     if (!btn) return;
@@ -501,24 +302,18 @@ function renderBranches(branches, useGSAP = true) {
     filterWrap.querySelectorAll('.city-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
-    visibleCount = STEP; // إعادة ضبط العداد
-    const selectedCity = btn.dataset.city;
-    applyVisibility(selectedCity);
-
-    gsap.fromTo(
-      grid.querySelectorAll('.branch-card:not(.hidden)'),
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, stagger: 0.05, duration: 0.5, ease: 'power3.out' }
-    );
+    visibleCount = STEP;
+    applyVisibility(btn.dataset.city);
+    observeFadeIn('.branch-card:not(.hidden)');
   });
 
-  if (useGSAP) animateBranches();
+  observeFadeIn('.branch-card');
 }
 
 // ============================================================
 // RENDER CONTACT
 // ============================================================
-function renderContact(items, useGSAP = true) {
+function renderContact(items) {
   const phonesWrap  = document.getElementById('contact-phones');
   const actionsWrap = document.getElementById('contact-actions');
   phonesWrap.innerHTML  = '';
@@ -554,13 +349,13 @@ function renderContact(items, useGSAP = true) {
       </a>`;
   }
 
-  if (useGSAP) animateContact();
+  observeFadeIn('.contact-card');
 }
 
 // ============================================================
 // RENDER BRANDS
 // ============================================================
-function renderBrands(brands, useGSAP = true) {
+function renderBrands(brands) {
   const grid = document.getElementById('brands-grid');
   grid.innerHTML = '';
 
@@ -569,7 +364,6 @@ function renderBrands(brands, useGSAP = true) {
   brands.forEach((brand, i) => {
     const card = document.createElement('div');
 
-    // Route relative logo paths through img.php (resize from ~5000px to 300px)
     const logoSrc = brand.logo_url && !brand.logo_url.match(/^https?:\/\//)
       ? `api/img.php?src=${brand.logo_url}&w=300`
       : brand.logo_url;
@@ -596,9 +390,12 @@ function renderBrands(brands, useGSAP = true) {
     grid.appendChild(card);
   });
 
-  if (useGSAP) animateBrands();
+  observeFadeIn('.brand-card');
 }
 
+// ============================================================
+// RENDER ARTICLES
+// ============================================================
 function renderArticles(articles) {
   const grid = document.getElementById('articles-grid');
   const section = document.getElementById('articles');
@@ -613,7 +410,6 @@ function renderArticles(articles) {
   const STEP = 6;
   let visibleCount = STEP;
 
-  // رسم الكروت كلها (مخفية في البداية)
   articles.forEach(article => {
     const card = document.createElement('div');
     card.className = 'branch-card article-item hidden';
@@ -665,7 +461,6 @@ function renderArticles(articles) {
       }
     });
 
-    // زرار عرض المزيد
     let showMoreBtn = document.getElementById('show-more-articles');
 
     if (allCards.length > visibleCount) {
@@ -691,7 +486,7 @@ function renderArticles(articles) {
 }
 
 // ============================================================
-// RENDER CATEGORIES  (سلايدر الأقسام)
+// RENDER CATEGORIES
 // ============================================================
 function renderCategories(categories, settings) {
   const container = document.getElementById('categories-slider');
@@ -707,7 +502,6 @@ function renderCategories(categories, settings) {
   const speed    = parseInt(settings?.slider_speed  || '3000');
   const perView  = parseInt(settings?.slider_per_view || '5');
 
-  // Split categories into pages of perView
   const pages = [];
   for (let i = 0; i < categories.length; i += perView) {
     pages.push(categories.slice(i, i + perView));
@@ -726,7 +520,6 @@ function renderCategories(categories, settings) {
     `<div class="dot${pi === 0 ? ' active' : ''}"></div>`
   ).join('');
 
-  // Single page — no slider chrome needed
   if (pages.length <= 1) {
     container.innerHTML = `<div class="slider-wrapper">${slidesHTML}</div>`;
     return;
@@ -767,18 +560,14 @@ function initCatSlider(autoplay, speed) {
     if (dots[index]) dots[index].classList.add('active');
   }
 
-  function goToNextImage() { goTo(index + 1); }
-  function goToPreviousImage() { goTo(index - 1); }
-
-  nextIcon.addEventListener('click', () => { goToNextImage(); resetAuto(); });
-  prevIcon.addEventListener('click', () => { goToPreviousImage(); resetAuto(); });
-
+  nextIcon.addEventListener('click', () => { goTo(index + 1); resetAuto(); });
+  prevIcon.addEventListener('click', () => { goTo(index - 1); resetAuto(); });
   dots.forEach((dot, i) => dot.addEventListener('click', () => { goTo(i); resetAuto(); }));
 
   function startAuto() {
     clearInterval(timer);
     if (!autoplay) return;
-    timer = setInterval(goToNextImage, speed);
+    timer = setInterval(() => goTo(index + 1), speed);
   }
   function resetAuto() { startAuto(); }
 
@@ -792,35 +581,31 @@ function initCatSlider(autoplay, speed) {
 }
 
 // ============================================================
-// REALTIME DATA LISTENER — Server-Sent Events (SSE)
+// APPLY DATA
 // ============================================================
 function applyData(data) {
   if (!data.success) return;
-  const s       = data.settings || {};
-  const useGSAP = s.perf_animations !== '0';
-  if (!useGSAP) document.body.classList.add('css-anim');
+  const s = data.settings || {};
+  if (s.perf_animations !== '0') document.body.classList.add('css-anim');
 
-  renderSocial(data.social || [], useGSAP);
-  renderBranches(data.branches || [], useGSAP);
-  renderContact(data.contact || [], useGSAP);
+  renderSocial(data.social || []);
+  renderBranches(data.branches || []);
+  renderContact(data.contact || []);
   renderCategories(data.categories || [], s);
-  renderBrands(data.brands || [], useGSAP);
+  renderBrands(data.brands || []);
   renderArticles(data.articles || []);
 }
 
 function loadData() {
-  // Data injected by PHP (index.php) — zero network requests
   if (window.__DATA__) {
     applyData(window.__DATA__);
     return;
   }
-
-  // Fallback: opened as plain HTML or PHP unavailable
   loadFallbackData();
 }
 
 // ============================================================
-// FALLBACK STATIC DATA (works without PHP)
+// FALLBACK STATIC DATA
 // ============================================================
 function loadFallbackData() {
   const social = [
@@ -889,6 +674,7 @@ function loadFallbackData() {
 
   const brands = brandNames.map(b => ({ name_en: b.en, name_ar: b.ar, logo_url: null }));
 
+  document.body.classList.add('css-anim');
   renderSocial(social);
   renderBranches(branches);
   renderContact(contact);
@@ -896,96 +682,10 @@ function loadFallbackData() {
 }
 
 // ============================================================
-// SECTION HEADERS SCROLL ANIMATION
-// ============================================================
-function initSectionAnimations() {
-  gsap.utils.toArray('.section-header').forEach(header => {
-    gsap.from(header, {
-      scrollTrigger: {
-        trigger: header,
-        start: 'top 85%',
-      },
-      opacity: 0,
-      y: 40,
-      duration: 0.8,
-      ease: 'power3.out',
-    });
-  });
-}
-
-// ============================================================
-// PARALLAX ON PATTERNS
-// ============================================================
-function initParallax() {
-  gsap.utils.toArray('.section-pattern-accent, .brands-pattern-bottom, .footer-pattern').forEach(el => {
-    gsap.to(el, {
-      scrollTrigger: {
-        trigger: el,
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: true,
-      },
-      y: -40,
-      ease: 'none',
-    });
-  });
-
-  gsap.to('.hero-pattern-top', {
-    scrollTrigger: {
-      trigger: '.hero-section',
-      start: 'top top',
-      end: 'bottom top',
-      scrub: true,
-    },
-    y: -80,
-    ease: 'none',
-  });
-
-  gsap.to('.hero-pattern-bottom', {
-    scrollTrigger: {
-      trigger: '.hero-section',
-      start: 'top top',
-      end: 'bottom top',
-      scrub: true,
-    },
-    y: 60,
-    ease: 'none',
-  });
-}
-
-// ============================================================
-// SCROLL-TRIGGERED GSAP for ScrollTo (fallback)
-// ============================================================
-if (gsap.plugins && !gsap.plugins.scrollTo) {
-  const _links = document.querySelectorAll('a[href^="#"]');
-  _links.forEach(link => {
-    link.addEventListener('click', (e) => {
-      const href = link.getAttribute('href');
-      if (href && href.length > 1) {
-        e.preventDefault();
-        const target = document.querySelector(href);
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }
-    });
-  });
-}
-
-// ============================================================
 // INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-  // Only run homepage-specific code when the preloader exists
-  if (!document.getElementById('preloader')) return;
-
-  initParticles();
-
-  runPreloader(() => {
-    heroEntrance();
-    initHeader();
-    initSectionAnimations();
-    initParallax();
-    loadData();
-  });
+  initHeader();
+  heroEntrance();
+  loadData();
 });

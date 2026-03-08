@@ -182,14 +182,7 @@ $bodyCode   = $settings['body_code']   ?? '';
     <!-- Body code (from admin settings) -->
     <div style="position:absolute;width:0;height:0;overflow:hidden"><?= $bodyCode ?></div>
     <?php endif; ?>
-    <div id="preloader" class="preloader">
-      <div class="preloader-inner">
-        <img src="logob.webp" alt="مخازن العناية" class="preloader-logo" />
-        <div class="preloader-dots">
-          <span></span><span></span><span></span>
-        </div>
-      </div>
-    </div>
+
     <header id="site-header" class="site-header">
       <div class="header-inner">
         <a href="#hero" class="header-logo">
@@ -342,8 +335,6 @@ $bodyCode   = $settings['body_code']   ?? '';
         100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
       }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
     <script src="api/minify.php?f=assets/js/main.js" defer></script>
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WZSZSGPN" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </body>
