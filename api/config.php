@@ -36,6 +36,8 @@ function getDB(): PDO {
 // JSON Response Helper
 // ------------------------------------------------
 function jsonResponse(array $data, int $code = 200): void {
+    // امسح أي output متراكم (PHP warnings, notices) عشان ميكسرش الـ JSON
+    while (ob_get_level() > 0) ob_end_clean();
     http_response_code($code);
     header('Content-Type: application/json; charset=utf-8');
     header('Access-Control-Allow-Origin: *');
