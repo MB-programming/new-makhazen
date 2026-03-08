@@ -342,10 +342,6 @@ $bodyCode   = $settings['body_code']   ?? '';
         100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
       }
     </style>
-    <?php if (($settings['perf_animations'] ?? '1') !== '0'): ?>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-    <?php endif; ?>
     <script src="api/minify.php?f=assets/js/main.js" defer></script>
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WZSZSGPN" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </body>
