@@ -5,8 +5,12 @@ Options -Indexes
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # terms.html → terms.php
-  RewriteRule ^terms\.html$ terms.php [R=301,L]
+  # terms.html → terms.php (301 redirect)
+  RewriteRule ^terms\.html$ /terms.php [R=301,L]
+
+  # Clean URL redirects
+  RewriteRule ^terms/?$ /terms.php [R=301,L]
+  RewriteRule ^privacy/?$ /privacy.html [R=301,L]
 
   # Serve index.php for root requests
   RewriteCond %{REQUEST_FILENAME} !-f
