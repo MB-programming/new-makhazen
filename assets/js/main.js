@@ -6,14 +6,6 @@
 "use strict";
 
 // ============================================================
-// HERO ENTRANCE — CSS transitions via class toggle
-// ============================================================
-function heroEntrance() {
-  document.getElementById('site-header')?.classList.add('visible');
-  document.body.classList.add('css-anim');
-}
-
-// ============================================================
 // STICKY HEADER ON SCROLL
 // ============================================================
 function initHeader() {
@@ -41,10 +33,7 @@ function observeFadeIn(selector) {
   const io = new IntersectionObserver((entries, obs) => {
     entries.forEach((entry, i) => {
       if (entry.isIntersecting) {
-        setTimeout(() => {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'none';
-        }, i * 60);
+        setTimeout(() => entry.target.classList.add('visible'), i * 60);
         obs.unobserve(entry.target);
       }
     });
@@ -586,7 +575,6 @@ function initCatSlider(autoplay, speed) {
 function applyData(data) {
   if (!data.success) return;
   const s = data.settings || {};
-  if (s.perf_animations !== '0') document.body.classList.add('css-anim');
 
   renderSocial(data.social || []);
   renderBranches(data.branches || []);
@@ -674,7 +662,6 @@ function loadFallbackData() {
 
   const brands = brandNames.map(b => ({ name_en: b.en, name_ar: b.ar, logo_url: null }));
 
-  document.body.classList.add('css-anim');
   renderSocial(social);
   renderBranches(branches);
   renderContact(contact);
@@ -686,6 +673,6 @@ function loadFallbackData() {
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
   initHeader();
-  heroEntrance();
+  observeFadeIn('.section-header');
   loadData();
 });

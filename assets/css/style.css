@@ -61,9 +61,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   padding: 12px 20px;
   background: transparent;
   transition: background var(--transition), box-shadow var(--transition), padding var(--transition);
-  transform: translateY(-100%);
 }
-.site-header.visible { transform: translateY(0); }
 .site-header.scrolled {
   background: rgba(255,255,255,0.96);
   backdrop-filter: blur(12px);
@@ -156,12 +154,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, transparent 100%);
   -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, transparent 100%);
 }
-.hero-particles {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
+
 .hero-content {
   position: relative;
   z-index: 2;
@@ -173,8 +166,11 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   text-align: center;
 }
 .hero-logo-wrap {
-  opacity: 0;
-  transform: scale(0.85);
+  animation: hero-pop 0.8s ease both;
+}
+@keyframes hero-pop {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
 }
 .hero-logo-img {
   width: 260px;
@@ -187,8 +183,6 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   font-weight: 800;
   color: var(--black-soft);
   letter-spacing: 2px;
-  opacity: 0;
-  transform: translateY(20px);
   line-height: 1.7;
 }
 .hero-tagline em { color: var(--white); font-style: normal; font-weight: 700; }
@@ -198,8 +192,12 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   align-items: center;
   gap: 24px;
   margin-top: 8px;
-  opacity: 0;
-  transform: translateY(30px);
+  animation: hero-rise 0.7s ease both;
+  animation-delay: 0.4s;
+}
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
 }
 .stat-item {
   display: flex;
@@ -228,7 +226,14 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
    SECTION SHARED STYLES
 ============================================================ */
 section { padding: 80px 0; }
-.section-header { text-align: center; margin-bottom: 48px; }
+.section-header {
+  text-align: center;
+  margin-bottom: 48px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.section-header.visible { opacity: 1; transform: none; }
 .section-badge {
   display: inline-block;
   font-size: 12px;
@@ -278,10 +283,11 @@ section { padding: 80px 0; }
   color: var(--black);
   position: relative;
   overflow: hidden;
-  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+  transition: opacity 0.5s ease, transform 0.5s ease, border-color var(--transition), box-shadow var(--transition);
   opacity: 0;
-  transform: translateY(40px);
+  transform: translateY(30px);
 }
+.social-card.visible { opacity: 1; transform: none; }
 .social-card::before {
   content: '';
   position: absolute;
@@ -393,10 +399,11 @@ section { padding: 80px 0; }
   display: flex;
   flex-direction: column;
   gap: 10px;
-  transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+  transition: opacity 0.5s ease, transform 0.5s ease, border-color var(--transition), box-shadow var(--transition);
   opacity: 0;
   transform: translateY(30px);
 }
+.branch-card.visible { opacity: 1; transform: none; }
 .branch-card:hover {
   border-color: var(--black);
   transform: translateY(-3px);
@@ -565,7 +572,9 @@ section { padding: 80px 0; }
   box-shadow: 0 0 60px rgba(255,207,6,0.08);
   opacity: 0;
   transform: scale(0.95);
+  transition: opacity 0.6s ease, transform 0.6s ease;
 }
+.contact-card.visible { opacity: 1; transform: none; }
 .contact-icon-wrap {
   width: 70px; height: 70px;
   background: rgba(255,207,6,0.1);
@@ -786,13 +795,14 @@ section { padding: 80px 0; }
   justify-content: center;
   gap: 8px;
   min-height: 110px;
-  transition: all var(--transition);
+  transition: opacity 0.5s ease, transform 0.5s ease, box-shadow var(--transition);
   cursor: default;
   opacity: 0;
   transform: scale(0.9);
   position: relative;
   overflow: hidden;
 }
+.brand-card.visible { opacity: 1; transform: none; }
 .brand-card::after {
   content: '';
   position: absolute;
@@ -1018,51 +1028,4 @@ section#hero { padding: 65px 0px 0px 0; }
         display: flex;
         justify-content: center;
     }
-}
-/* ============================================================
-   CSS-ONLY ANIMATION MODE  (body.css-anim)
-   يتفعّل عند تعطيل GSAP من لوحة التحكم
-============================================================ */
-
-/* إظهار كل العناصر المخفية فوراً */
-body.css-anim .site-header          { transform: translateY(0) !important; opacity: 1 !important; }
-body.css-anim .hero-pattern-top,
-body.css-anim .hero-pattern-bottom,
-body.css-anim #hero-logo,
-body.css-anim .hero-tagline,
-body.css-anim .hero-stats,
-body.css-anim #scroll-hint         { opacity: 1 !important; transform: none !important; }
-body.css-anim .social-card         { opacity: 1 !important; transform: none !important; }
-body.css-anim .branch-card         { opacity: 1 !important; transform: none !important; }
-body.css-anim .contact-card        { opacity: 1 !important; transform: none !important; }
-body.css-anim .brand-card          { opacity: 1 !important; transform: none !important; }
-body.css-anim .section-header      { opacity: 1 !important; transform: none !important; }
-
-/* تأثير fade-up بسيط عبر CSS */
-@keyframes css-fade-up {
-  from { opacity: 0; transform: translateY(28px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes css-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-body.css-anim .social-card {
-  animation: css-fade-up 0.5s ease both;
-}
-body.css-anim .social-card:nth-child(1) { animation-delay: 0.05s; }
-body.css-anim .social-card:nth-child(2) { animation-delay: 0.10s; }
-body.css-anim .social-card:nth-child(3) { animation-delay: 0.15s; }
-body.css-anim .social-card:nth-child(4) { animation-delay: 0.20s; }
-body.css-anim .social-card:nth-child(5) { animation-delay: 0.25s; }
-
-body.css-anim .branch-card {
-  animation: css-fade-up 0.4s ease both;
-}
-body.css-anim .brand-card {
-  animation: css-fade-in 0.4s ease both;
-}
-body.css-anim .contact-card {
-  animation: css-fade-up 0.6s ease both;
 }
