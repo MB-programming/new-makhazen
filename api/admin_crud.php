@@ -16,6 +16,10 @@ if (!in_array($table, $allowed_tables)) {
     jsonResponse(['success' => false, 'message' => 'Invalid table'], 400);
 }
 
+function bustPageCache(): void {
+    @unlink(__DIR__ . '/../cache/data/page_data.json');
+}
+
 // ------------------------------------------------
 // GET - list all records
 // ------------------------------------------------
@@ -164,6 +168,7 @@ if ($method === 'POST') {
             ]);
             break;
     }
+    bustPageCache();
     jsonResponse(['success' => true, 'message' => 'تم الإضافة بنجاح', 'id' => $db->lastInsertId()]);
 }
 
@@ -282,6 +287,7 @@ if ($method === 'PUT' && $id) {
             ]);
             break;
     }
+    bustPageCache();
     jsonResponse(['success' => true, 'message' => 'تم التحديث بنجاح']);
 }
 
@@ -291,6 +297,7 @@ if ($method === 'PUT' && $id) {
 if ($method === 'DELETE' && $id) {
     $stmt = $db->prepare("DELETE FROM `$table` WHERE id = ?");
     $stmt->execute([$id]);
+    bustPageCache();
     jsonResponse(['success' => true, 'message' => 'تم الحذف بنجاح']);
 }
 
@@ -300,6 +307,7 @@ if ($method === 'DELETE' && $id) {
 if ($method === 'PATCH' && $id) {
     $stmt = $db->prepare("UPDATE `$table` SET is_active = NOT is_active WHERE id = ?");
     $stmt->execute([$id]);
+    bustPageCache();
     jsonResponse(['success' => true, 'message' => 'تم تغيير الحالة']);
 }
 

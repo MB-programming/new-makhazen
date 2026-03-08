@@ -15,17 +15,24 @@ $db = getDB();
 
 // Auto-create table if not exists
 $db->exec("CREATE TABLE IF NOT EXISTS registrations (
-    id          INT AUTO_INCREMENT PRIMARY KEY,
-    ref_number  VARCHAR(40)  NOT NULL UNIQUE,
-    full_name   VARCHAR(100) NOT NULL,
-    email       VARCHAR(150) NOT NULL,
-    phone       VARCHAR(15)  NOT NULL,
-    national_id VARCHAR(10)  NOT NULL UNIQUE,
-    city        VARCHAR(80)  NOT NULL,
-    gender      ENUM('male','female') NOT NULL,
-    ip_address  VARCHAR(45)  DEFAULT NULL,
-    created_at  DATETIME     DEFAULT CURRENT_TIMESTAMP
+    id            INT AUTO_INCREMENT PRIMARY KEY,
+    ref_number    VARCHAR(40)  NOT NULL UNIQUE,
+    full_name     VARCHAR(100) NOT NULL,
+    email         VARCHAR(150) NOT NULL,
+    phone         VARCHAR(15)  NOT NULL,
+    national_id   VARCHAR(10)  NOT NULL UNIQUE,
+    city          VARCHAR(80)  NOT NULL,
+    gender        ENUM('male','female') NOT NULL,
+    prev_customer TINYINT(1)   NOT NULL DEFAULT 0,
+    ip_address    VARCHAR(45)  DEFAULT NULL,
+    created_at    DATETIME     DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+// أضف العمود إن لم يكن موجوداً (للجداول القديمة)
+try {
+    $db->exec("ALTER TABLE registrations ADD COLUMN IF NOT EXISTS
+        prev_customer TINYINT(1) NOT NULL DEFAULT 0 AFTER gender");
+} catch (Exception $e) { /* العمود موجود بالفعل */ }
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -54,8 +61,9 @@ if ($method === 'POST' && empty($_GET['admin'])) {
     $phone       = trim($body['phone']       ?? '');
     $national_id = trim($body['national_id'] ?? '');
     $city        = clean($body['city']        ?? '');
-    $gender      = trim($body['gender']       ?? '');
-    $terms       = !empty($body['terms']);
+    $gender        = trim($body['gender']        ?? '');
+    $prev_customer = isset($body['prev_customer']) ? (int)(bool)$body['prev_customer'] : -1;
+    $terms         = !empty($body['terms']);
 
     // ---- Validate ----
     $errors = [];
@@ -71,6 +79,8 @@ if ($method === 'POST' && empty($_GET['admin'])) {
         $errors[] = 'المدينة مطلوبة';
     if (!in_array($gender, ['male', 'female']))
         $errors[] = 'يرجى اختيار الجنس';
+    if ($prev_customer === -1)
+        $errors[] = 'يرجى الإجابة على سؤال التعامل السابق مع مخازن العناية';
     if (!$terms)
         $errors[] = 'يجب الموافقة على الشروط والأحكام';
 
@@ -118,10 +128,10 @@ if ($method === 'POST' && empty($_GET['admin'])) {
     // ---- Insert ----
     $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? null;
     $stmt = $db->prepare("INSERT INTO registrations
-        (ref_number, full_name, email, phone, national_id, city, gender, ip_address)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        (ref_number, full_name, email, phone, national_id, city, gender, prev_customer, ip_address)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([$ref_number, $full_name, $email, $phone,
-                    $national_id, $city, $gender, $ip]);
+                    $national_id, $city, $gender, $prev_customer, $ip]);
 
     // ---- Fetch back for date ----
     $row = $db->prepare("SELECT created_at FROM registrations WHERE id = ?");
