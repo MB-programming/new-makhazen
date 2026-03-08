@@ -73,12 +73,45 @@ $isActive = $comp['active'];
         linear-gradient(to bottom, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.75) 100%),
         linear-gradient(135deg, rgba(10,10,0,0.5) 0%, rgba(26,18,0,0.4) 50%, rgba(10,10,0,0.5) 100%);
     }
-    .hero-content { position: relative; z-index: 1; padding: 80px 20px 52px; }
+    .hero-content { position: relative; z-index: 1; padding: 48px 20px 40px; }
     .hero-banner .trophy {
       font-size: 58px; line-height: 1; margin-bottom: 18px;
       display: block; color: #FFCF06;
       filter: drop-shadow(0 0 20px rgba(255,207,6,0.5));
     }
+
+    /* ── Hero Slider (replaces trophy when images exist) ──── */
+    .hero-slider-wrap {
+      position: relative; overflow: hidden; margin-bottom: 24px;
+      border-radius: 14px;
+      max-width: 560px; margin-left: auto; margin-right: auto;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.5);
+    }
+    .hero-slider-track {
+      display: flex; transition: transform .5s ease;
+    }
+    .hero-slider-track img {
+      min-width: 100%; width: 100%; height: 220px;
+      object-fit: cover; display: block; border-radius: 14px;
+    }
+    .hero-slider-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,0.55); border: 1px solid rgba(255,207,6,0.4);
+      color: #FFCF06; width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 12px; z-index: 2;
+    }
+    .hero-slider-btn.prev { right: 8px; }
+    .hero-slider-btn.next { left: 8px; }
+    .hero-slider-dots {
+      position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 5px;
+    }
+    .hero-slider-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.35); cursor: pointer; transition: background .25s;
+    }
+    .hero-slider-dot.active { background: #FFCF06; }
     .hero-banner h1 {
       font-size: clamp(22px, 5vw, 36px); font-weight: 800;
       color: #FFCF06; margin-bottom: 10px; font-family: 'Tajawal', sans-serif;
@@ -203,43 +236,6 @@ $isActive = $comp['active'];
     .swal-ref-card .ref-val { font-weight: 700; color: #fff; margin-right: auto; }
 
     .site-footer { margin-top: 60px; }
-
-    /* ── Image Slider ─────────────────────────────────────── */
-    .comp-slider {
-      max-width: 640px; margin: 28px auto 0; padding: 0 16px;
-    }
-    .slider-track-wrap {
-      position: relative; overflow: hidden; border-radius: 16px;
-      border: 1px solid rgba(255,207,6,0.2);
-      background: #111;
-    }
-    .slider-track {
-      display: flex; transition: transform .5s ease;
-    }
-    .slider-track img {
-      min-width: 100%; width: 100%; max-height: 320px;
-      object-fit: cover; display: block; border-radius: 16px;
-    }
-    .slider-btn {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      background: rgba(0,0,0,0.55); border: 1px solid rgba(255,207,6,0.35);
-      color: #FFCF06; width: 36px; height: 36px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 14px; z-index: 2;
-      transition: background .2s;
-    }
-    .slider-btn:hover { background: rgba(255,207,6,0.2); }
-    .slider-btn.prev { right: 10px; }
-    .slider-btn.next { left: 10px; }
-    .slider-dots {
-      display: flex; justify-content: center; gap: 6px; margin-top: 10px;
-    }
-    .slider-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: rgba(255,207,6,0.25); cursor: pointer;
-      transition: background .25s;
-    }
-    .slider-dot.active { background: #FFCF06; }
   </style>
 </head>
 <body>
@@ -270,34 +266,30 @@ $isActive = $comp['active'];
   </div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
+    <?php if (!empty($comp['slider_images'])): ?>
+    <div class="hero-slider-wrap">
+      <div class="hero-slider-track" id="slider-track">
+        <?php foreach ($comp['slider_images'] as $img): ?>
+          <img src="<?= htmlspecialchars('../' . $img, ENT_QUOTES, 'UTF-8') ?>" alt="" loading="lazy" />
+        <?php endforeach; ?>
+      </div>
+      <?php if (count($comp['slider_images']) > 1): ?>
+      <button class="hero-slider-btn prev" onclick="sliderMove(-1)" aria-label="السابق"><i class="fas fa-chevron-right"></i></button>
+      <button class="hero-slider-btn next" onclick="sliderMove(1)"  aria-label="التالي"><i class="fas fa-chevron-left"></i></button>
+      <div class="hero-slider-dots" id="slider-dots">
+        <?php foreach ($comp['slider_images'] as $i => $_): ?>
+          <div class="hero-slider-dot<?= $i === 0 ? ' active' : '' ?>" onclick="sliderGo(<?= $i ?>)"></div>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
+    </div>
+    <?php else: ?>
     <span class="trophy"><i class="fas fa-trophy"></i></span>
+    <?php endif; ?>
     <h1><?= $title ?></h1>
     <p><?= $subtitle ?></p>
   </div>
 </div>
-
-<?php if (!empty($comp['slider_images'])): ?>
-<div class="comp-slider" id="comp-slider">
-  <div class="slider-track-wrap">
-    <div class="slider-track" id="slider-track">
-      <?php foreach ($comp['slider_images'] as $img): ?>
-        <img src="<?= htmlspecialchars('../' . $img, ENT_QUOTES, 'UTF-8') ?>" alt="" loading="lazy" />
-      <?php endforeach; ?>
-    </div>
-    <?php if (count($comp['slider_images']) > 1): ?>
-    <button class="slider-btn prev" onclick="sliderMove(-1)" aria-label="السابق"><i class="fas fa-chevron-right"></i></button>
-    <button class="slider-btn next" onclick="sliderMove(1)"  aria-label="التالي"><i class="fas fa-chevron-left"></i></button>
-    <?php endif; ?>
-  </div>
-  <?php if (count($comp['slider_images']) > 1): ?>
-  <div class="slider-dots" id="slider-dots">
-    <?php foreach ($comp['slider_images'] as $i => $_): ?>
-      <div class="slider-dot<?= $i === 0 ? ' active' : '' ?>" onclick="sliderGo(<?= $i ?>)"></div>
-    <?php endforeach; ?>
-  </div>
-  <?php endif; ?>
-</div>
-<?php endif; ?>
 
 <div class="form-wrap">
 <?php if (!$isActive): ?>
@@ -514,7 +506,7 @@ document.getElementById('national_id').addEventListener('input', function() {
   function goTo(n) {
     cur = (n + slides) % slides;
     track.style.transform = 'translateX(' + (cur * 100) + '%)';
-    document.querySelectorAll('.slider-dot').forEach((d, i) => d.classList.toggle('active', i === cur));
+    document.querySelectorAll('.hero-slider-dot').forEach((d, i) => d.classList.toggle('active', i === cur));
   }
 
   window.sliderMove = function(dir) { goTo(cur + dir); resetTimer(); };

@@ -200,35 +200,36 @@ function branchLink(string $name, array &$map): string {
       <ul class="terms-list">
         <li>المسابقة مرخصة من الغرفة التجارية الصناعية بالرياض بالترخيص رقم: <strong>0000</strong></li>
         <li>الجوائز هي: <strong>سيارتين من نوع جيلي</strong></li>
-        <li>الاشتراك في المسابقة داخل المملكة العربية السعودية فقط، يشترط أن يكون المتسابق سعودي الجنسية أو مقيماً في المملكة العربية السعودية بشكل نظامي.</li>
-        <li>يتوجب على المتسابق التسجيل في رابط المسابقة باسمه الثلاثي المدوّن في الهوية النظامية ورقم جواله وهويته، ويعتبر إتمام التسجيل قبولاً بالشروط والأحكام.</li>
-        <li>تبدأ المسابقة بتاريخ: <strong>04 فبراير 2026</strong> وحتى <strong>04 أبريل 2026</strong>. سيتم اختيار الفائز من المتسابقين بشكل عشوائي من لجنة الفرز بحضور ممثل الغرفة التجارية.</li>
-        <li>تُعلن النتائج النهائية خلال ثلاثين يوماً من تاريخ انتهاء المسابقة.</li>
+        <li>الاشتراك في المسابقة داخل المملكة العربية السعودية فقط يشترط أن يكون المتسابق في المسابقة سعودي الجنسية أو مقيم في المملكة العربية السعودية بشكل نظامي.</li>
+        <li>يتوجب على المتسابق التسجيل في رابط المسابقة باسمه الثلاثي المدون في الهوية النظامية ورقم جواله وهويته، ويعتبر إتمام التسجيل قبولاً بالشروط والأحكام.</li>
+        <li>تبدأ المسابقة بتاريخ: من <strong>04 فبراير 2026</strong> وحتى <strong>04 أبريل 2026</strong> سيتم اختيار الفائز من المتسابقين بشكل عشوائي من لجنة الفرز التي بحضور ممثل الغرفة التجارية.</li>
+        <li>تعلن النتائج النهائية خلال ثلاثين يوم من تاريخ انتهاء المسابقة.</li>
         <li>لا يشترط الشراء أو حضور المتسابق وقت السحب للحصول على الجائزة.</li>
         <li>تسليم الجوائز للفائزين خلال سبعة أيام من تاريخ إعلان نتائج المسابقة.</li>
         <li>لا يجوز لمن صدر له ترخيص تنظيم المسابقة وأبنائه وأزواجه ووالديه وموظفيه الاشتراك في المسابقة.</li>
-        <li>يقرّ الفائز بموافقته لشركة مخازن العناية بتوثيق ونشر صور وفيديوهات الفائز والجائزة.</li>
+        <li>يقر الفائز بموافقته لشركة مخازن العناية بتوثيق ونشر صور وفيديوهات الفائز والجائزة.</li>
         <li>لا يحق للفائز استبدال الجائزة نقداً أو مقايضتها بمنتجات أخرى.</li>
-        <li>في حال تكرار فوز المتسابق، فإنه يستحق أول جائزة حصل عليها في السحب.</li>
+        <li>في حال تكرار فوز المتسابق فإنه يستحق أول جائزة حصل عليها في السحب.</li>
         <li>يشترط على الفائزين تقديم هوية نظامية سارية المفعول عند استلام الجائزة.</li>
-        <li>في حال لم يتطابق اسم الفائز في رابط الاشتراك مع الاسم الموجود بالهوية النظامية المعتمدة، يحق لشركة مخازن العناية استبعاده وإعادة السحب مرة أخرى.</li>
-        <li>إذا اتضح مخالفة الفائز لأي من الشروط والأحكام بعد إعلان فوزه، أو لم يحضر لاستلام الجائزة خلال سبعة أيام، يحق لشركة مخازن العناية اختيار فائز آخر.</li>
-        <li>إذا استلم الفائز الجائزة واتضح لاحقاً مخالفته للشروط، فيلتزم برد ما استلمه.</li>
-        <li>يجب على الفائز استلام الجائزة وفقاً للموعد والمكان المحددَين من قبل شركة مخازن العناية.</li>
+        <li>في حال لم يتطابق اسم الفائز في رابط الاشتراك في المسابقة مع الاسم الموجود بالهوية النظامية المعتمدة في المملكة العربية السعودية فيحق لشركة مخازن العناية استبعاده وإعادة السحب مرة أخرى.</li>
+        <li>في حال اتضح مخالفة الفائز لأي من الشروط والأحكام أعلاه بعد إعلان فوزه، أو لم يحضر لاستلام الجائزة خلال فترة سبعة أيام من تاريخ إعلان اسمه وإبلاغه، فيحق لشركة مخازن العناية اختيار فائز آخر.</li>
+        <li>في حال استلم الفائز الجائزة واتضح لاحقاً مخالفته للشروط والأحكام الخاصة بالمسابقة، فيلتزم برد ما استلمه.</li>
+        <li>يجب على الفائز استلام الجائزة وفقاً للموعد والمكان المحددين من قبل شركة مخازن العناية.</li>
+        <li>يقر الفائز بموافقته لشركة مخازن العناية بتوثيق ونشر صور وفيديوهات الفائز والجائزة.</li>
       </ul>
     </div>
 
     <div class="lang-divider">Terms and Conditions — English</div>
 
     <!-- شروط انجليزية -->
-    <div class="terms-section">
-      <h2><i class="fas fa-scroll" style="margin-left:8px"></i>Terms and Conditions</h2>
-      <ul class="terms-list">
+    <div class="terms-section" dir="ltr" style="text-align:left">
+      <h2 style="text-align:right;direction:rtl"><i class="fas fa-scroll" style="margin-left:8px"></i>Terms and Conditions</h2>
+      <ul class="terms-list" style="direction:ltr;text-align:left">
         <li>The competition is licensed by the Riyadh Chamber of Commerce and Industry under license number: <strong>0000</strong>.</li>
         <li>The prizes are: <strong>Two Geely cars</strong>.</li>
-        <li>Participation is limited to within the Kingdom of Saudi Arabia only. The participant must be a Saudi national or a legal resident of the Kingdom.</li>
+        <li>Participation in the competition is limited to within the Kingdom of Saudi Arabia only. The participant must be a Saudi national or a legal resident of the Kingdom of Saudi Arabia.</li>
         <li>The participant must register through the competition link using their full three-part name as stated in their official ID, along with their mobile number and ID details. Completing the registration constitutes acceptance of these Terms and Conditions.</li>
-        <li>The competition runs from <strong>February 04, 2026</strong>, until <strong>April 04, 2026</strong>. Winners will be selected randomly by a screening committee in the presence of a representative from the Chamber of Commerce.</li>
+        <li>The competition runs from <strong>February 04, 2026</strong>, until <strong>April 04, 2026</strong>. Winners will be selected randomly from among the participants by a screening committee in the presence of a representative from the Chamber of Commerce.</li>
         <li>The final results will be announced within thirty days from the end date of the competition.</li>
         <li>No purchase or presence at the time of the draw is required to win the prize.</li>
         <li>Prizes will be delivered to the winners within seven days from the date of announcing the competition results.</li>
@@ -237,27 +238,34 @@ function branchLink(string $name, array &$map): string {
         <li>The winner may not exchange the prize for cash or substitute it with other products.</li>
         <li>In the event that a participant wins more than once, they shall be entitled only to the first prize won in the draw.</li>
         <li>Winners must present a valid official ID upon receiving the prize.</li>
-        <li>If the winner's registered name does not match the official ID, Makhazen Al Enaya has the right to disqualify the winner and conduct another draw.</li>
-        <li>If the winner fails to claim the prize within seven days from the date of notification, Makhazen Al Enaya has the right to select another winner.</li>
-        <li>If the winner receives the prize and it is later found they violated the Terms, they shall be obligated to return what they have received.</li>
+        <li>If the winner's name registered in the competition link does not match the name stated in the official ID recognized in the Kingdom of Saudi Arabia, Makhazen Al Enaya Company has the right to disqualify the winner and conduct another draw.</li>
+        <li>If it is found that the winner violated any of the above Terms and Conditions after the announcement of their win, or if they fail to claim the prize within seven days from the date of announcing and notifying them, Makhazen Al Enaya Company has the right to select another winner.</li>
+        <li>If the winner receives the prize and it is later discovered that they violated the competition Terms and Conditions, they shall be obligated to return what they have received.</li>
         <li>The winner must collect the prize at the date and location specified by Makhazen Al Enaya Company.</li>
+        <li>By accepting the prize, the winner agrees to allow Makhazen Al Enaya Company to document and publish photos and videos of the winner and the prize.</li>
       </ul>
     </div>
 
-    <!-- طريقة الاشتراك -->
+    <!-- روابط الفروع وطريقة الاشتراك -->
     <div class="terms-section">
-      <h2><i class="fas fa-list-ol" style="margin-left:8px"></i>طريقة الاشتراك بالمسابقة</h2>
-      <ul class="steps-list">
+      <h2><i class="fas fa-map-marked-alt" style="margin-left:8px"></i>طريقة الاشتراك بالمسابقة</h2>
+
+      <p style="font-family:'Tajawal',sans-serif;font-size:15px;color:#ccc;margin-bottom:16px">
+        يوجد رابط تسجيل للمسابقة في فروع مخازن العناية في جميع أنحاء المملكة.
+      </p>
+
+      <ul class="steps-list" style="margin-bottom:20px">
         <li>زيارة أي فرع من فروع مخازن العناية والتسجيل في الرابط المنشور في جميع الفروع.</li>
       </ul>
 
-      <p style="margin:20px 0 12px;font-family:'Tajawal',sans-serif;font-size:15px;color:#aaa">
+      <p style="font-family:'Tajawal',sans-serif;font-size:15px;color:#aaa;margin-bottom:12px">
         <i class="fas fa-map-marker-alt" style="color:#FFCF06;margin-left:6px"></i>
-        مواقع فروع مخازن العناية:
+        للوصول للفروع:
       </p>
 
       <div class="branches-grid-terms">
         <?php
+        // الأسماء المعروضة كما وردت في المتطلبات مع البحث الجزئي في DB
         $termsBranches = [
             'الرياض - حي الياسمين',
             'الرياض - الدائري الشرقي',
@@ -266,7 +274,7 @@ function branchLink(string $name, array &$map): string {
             'الرياض - حي المحمدية',
             'الرياض - حي الفيحاء',
             'الرياض - ظهرة لبن',
-            'مكة المكرمة - الشرائع',
+            'مكة - الشرائع',
             'جدة - ابحر',
             'حفر الباطن',
             'جازان',
@@ -274,15 +282,14 @@ function branchLink(string $name, array &$map): string {
             'تبوك',
             'الخبر',
             'حائل',
-            'مكة المكرمة - فرع ٢',
+            'مكة المكرمة',
             'الأحساء',
             'الطائف',
-            'جدة - فرع ٢',
+            'جدة',
             'الدمام - حي النزهة',
         ];
 
         foreach ($termsBranches as $branchName) {
-            // ابحث عن اسم الفرع أو جزء منه في الـ DB
             $mapUrl = '#';
             foreach ($branches as $b) {
                 if (mb_stripos($b['name_ar'], $branchName) !== false
@@ -291,30 +298,34 @@ function branchLink(string $name, array &$map): string {
                     break;
                 }
             }
-            $href  = htmlspecialchars($mapUrl, ENT_QUOTES, 'UTF-8');
-            $label = htmlspecialchars($branchName, ENT_QUOTES, 'UTF-8');
+            $href     = htmlspecialchars($mapUrl, ENT_QUOTES, 'UTF-8');
+            $label    = htmlspecialchars($branchName, ENT_QUOTES, 'UTF-8');
             $disabled = ($mapUrl === '#') ? ' style="opacity:.5;pointer-events:none"' : '';
-            $target = ($mapUrl !== '#') ? ' target="_blank" rel="noopener"' : '';
+            $target   = ($mapUrl !== '#') ? ' target="_blank" rel="noopener"' : '';
             echo '<a href="' . $href . '" class="branch-link"' . $target . $disabled . '>'
-               . $label
-               . ' <i class="fas fa-map-marker-alt"></i></a>' . "\n";
+               . $label . ' <i class="fas fa-location-arrow"></i></a>' . "\n";
         }
         ?>
+      </div>
+
+      <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.05);direction:ltr;text-align:left">
+        <p style="font-size:14px;color:#888;font-family:'Tajawal',sans-serif;margin-bottom:10px">
+          Visit any branch of Makhazen Al Enaya and register through the link displayed in all branches.
+        </p>
       </div>
     </div>
 
     <!-- تحذير -->
     <div class="warning-box">
       <i class="fas fa-exclamation-triangle"></i>
-      <span>
-        مخازن العناية تحذّر من التعامل مع أي روابط وهمية أو استغلال غير قانوني للمسابقة أو اسم الشركة،
-        وتتبرأ من المسؤولية عن ذلك بشكل كامل.
-        <br />
-        <em style="color:#888;font-size:13px">
-          Makhazen Al Enaya warns against dealing with any fake links or illegal exploitation of the competition
-          or the company name, and disclaims full responsibility for such actions.
-        </em>
-      </span>
+      <div>
+        <p style="margin:0 0 6px">
+          مخازن العناية تحذر التعامل مع أي روابط وهمية أو استغلال غير قانوني للمسابقة أو اسم الشركة وتخلي مسؤوليتها عن ذلك بشكل كامل.
+        </p>
+        <p style="margin:0;color:#888;font-size:13px;direction:ltr;text-align:left">
+          Makhazen Al Enaya warns against dealing with any fake links or illegal exploitation of the competition or the company name, and disclaims full responsibility for such actions.
+        </p>
+      </div>
     </div>
 
 <?php endif; ?>
