@@ -71,45 +71,64 @@ $isActive = $comp['active'];
         linear-gradient(to bottom, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.75) 100%),
         linear-gradient(135deg, rgba(10,10,0,0.5) 0%, rgba(26,18,0,0.4) 50%, rgba(10,10,0,0.5) 100%);
     }
-    .hero-content { position: relative; z-index: 1; padding: 48px 20px 40px; }
+    .hero-content { position: relative; z-index: 1; }
     .hero-banner .trophy {
       font-size: 58px; line-height: 1; margin-bottom: 18px;
       display: block; color: #FFCF06;
       filter: drop-shadow(0 0 20px rgba(255,207,6,0.5));
     }
 
-    /* ── Hero Slider (replaces trophy when images exist) ──── */
+    /* ── Hero Slider ──────────────────────────────────────── */
+    .hero-content { padding: 48px 20px 40px; }
+
+    /* موبايل: مربّع بحجم ثابت في وسط الـ hero */
     .hero-slider-wrap {
       position: relative; overflow: hidden; margin-bottom: 24px;
       border-radius: 14px;
       max-width: 560px; margin-left: auto; margin-right: auto;
       box-shadow: 0 4px 32px rgba(0,0,0,0.5);
     }
-    .hero-slider-track {
-      display: flex; transition: transform .5s ease;
-    }
+    .hero-slider-track { display: flex; transition: transform .5s ease; }
     .hero-slider-track img {
       min-width: 100%; width: 100%; height: 220px;
       object-fit: cover; display: block; border-radius: 14px;
     }
+
+    /* ديسكتوب: السلايدر يملأ عرض الـ hero بالكامل وارتفاعه من الصورة */
+    @media (min-width: 768px) {
+      .hero-banner { overflow: hidden; }
+      .hero-content { padding: 0 0 32px; }
+      .hero-slider-wrap {
+        max-width: 100%; border-radius: 0;
+        box-shadow: none; margin-bottom: 0;
+      }
+      .hero-slider-track img {
+        height: auto; max-height: 520px;
+        object-fit: cover; border-radius: 0;
+      }
+      .hero-banner h1 { margin-top: 24px; }
+    }
+
     .hero-slider-btn {
       position: absolute; top: 50%; transform: translateY(-50%);
       background: rgba(0,0,0,0.55); border: 1px solid rgba(255,207,6,0.4);
-      color: #FFCF06; width: 32px; height: 32px; border-radius: 50%;
+      color: #FFCF06; width: 36px; height: 36px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 12px; z-index: 2;
+      cursor: pointer; font-size: 13px; z-index: 2;
+      transition: background .2s;
     }
-    .hero-slider-btn.prev { right: 8px; }
-    .hero-slider-btn.next { left: 8px; }
+    .hero-slider-btn:hover { background: rgba(255,207,6,0.15); }
+    .hero-slider-btn.prev { right: 12px; }
+    .hero-slider-btn.next { left: 12px; }
     .hero-slider-dots {
-      position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 5px;
+      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 6px;
     }
     .hero-slider-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: rgba(255,255,255,0.35); cursor: pointer; transition: background .25s;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: rgba(255,255,255,0.35); cursor: pointer; transition: background .25s, transform .25s;
     }
-    .hero-slider-dot.active { background: #FFCF06; }
+    .hero-slider-dot.active { background: #FFCF06; transform: scale(1.3); }
     .hero-banner h1 {
       font-size: clamp(22px, 5vw, 36px); font-weight: 800;
       color: #FFCF06; margin-bottom: 10px; font-family: 'Tajawal', sans-serif;
