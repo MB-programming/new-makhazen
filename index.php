@@ -182,14 +182,7 @@ $bodyCode   = $settings['body_code']   ?? '';
     <!-- Body code (from admin settings) -->
     <div style="position:absolute;width:0;height:0;overflow:hidden"><?= $bodyCode ?></div>
     <?php endif; ?>
-    <div id="preloader" class="preloader">
-      <div class="preloader-inner">
-        <img src="logob.webp" alt="مخازن العناية" class="preloader-logo" width="200" height="92" />
-        <div class="preloader-dots">
-          <span></span><span></span><span></span>
-        </div>
-      </div>
-    </div>
+
     <header id="site-header" class="site-header">
       <div class="header-inner">
         <a href="#hero" class="header-logo">

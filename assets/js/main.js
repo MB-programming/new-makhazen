@@ -6,23 +6,6 @@
 "use strict";
 
 // ============================================================
-// PRELOADER
-// ============================================================
-function runPreloader(onComplete) {
-  const preloader = document.getElementById('preloader');
-  if (!preloader) { onComplete(); return; }
-
-  preloader.style.transition = 'opacity 0.3s ease';
-  setTimeout(() => {
-    preloader.style.opacity = '0';
-    setTimeout(() => {
-      preloader.style.display = 'none';
-      onComplete();
-    }, 320);
-  }, 600);
-}
-
-// ============================================================
 // HERO ENTRANCE — CSS transitions via class toggle
 // ============================================================
 function heroEntrance() {
@@ -702,11 +685,7 @@ function loadFallbackData() {
 // INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-  if (!document.getElementById('preloader')) return;
-
   initHeader();
-  runPreloader(() => {
-    heroEntrance();
-    loadData();
-  });
+  heroEntrance();
+  loadData();
 });
