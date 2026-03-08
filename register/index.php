@@ -291,13 +291,13 @@ $isActive = $comp['active'];
       <div class="hero-slider-track" id="slider-track">
 
         <!-- صورة 1 — غيّر الـ src بمسار صورتك -->
-        <img src="../assets/slider/slide_1.webp" alt="" loading="eager" />
+        <img src="https://makhazenalenaya.sa/assets/brands/slider-2.webp" alt="" loading="eager" />
 
         <!-- صورة 2 -->
-        <img src="../assets/slider/slide_2.webp" alt="" loading="lazy" />
+        <img src="https://makhazenalenaya.sa/assets/brands/slider-2.webp" alt="" loading="lazy" />
 
         <!-- صورة 3 -->
-        <img src="../assets/slider/slide_3.webp" alt="" loading="lazy" />
+        <img src="https://makhazenalenaya.sa/assets/brands/slider-2.webp" alt="" loading="lazy" />
 
         <!-- لإضافة صورة جديدة انسخ السطر ↓ والصقه هنا وغيّر المسار
         <img src="../assets/slider/slide_X.webp" alt="" loading="lazy" />
