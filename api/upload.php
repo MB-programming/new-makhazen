@@ -1,4 +1,5 @@
 <?php
+ob_start(); // منع أي output يكسر الـ JSON response
 // ================================================
 // Image Upload — تحويل تلقائي إلى WebP
 // type=logo  → assets/brands/

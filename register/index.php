@@ -558,6 +558,9 @@ function showSuccess(data) {
       const p = document.querySelector('.swal2-popup');
       if (p) Object.assign(p.style, { fontFamily:"'Tajawal',sans-serif", direction:'rtl', borderRadius:'20px', border:'1px solid rgba(255,207,6,0.25)', maxWidth:'480px' });
     },
+    willClose: () => {
+      window.location.href = '../index.php';
+    },
   });
 }
 
