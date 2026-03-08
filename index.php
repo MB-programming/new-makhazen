@@ -184,7 +184,7 @@ $bodyCode   = $settings['body_code']   ?? '';
     <?php endif; ?>
     <div id="preloader" class="preloader">
       <div class="preloader-inner">
-        <img src="logob.webp" alt="مخازن العناية" class="preloader-logo" />
+        <img src="logob.webp" alt="مخازن العناية" class="preloader-logo" width="200" height="92" />
         <div class="preloader-dots">
           <span></span><span></span><span></span>
         </div>
@@ -193,7 +193,7 @@ $bodyCode   = $settings['body_code']   ?? '';
     <header id="site-header" class="site-header">
       <div class="header-inner">
         <a href="#hero" class="header-logo">
-          <img src="logob.webp" alt="مخازن العناية" />
+          <img src="logob.webp" alt="مخازن العناية" width="113" height="52" />
         </a>
         <nav class="header-nav">
           <a href="#pranches" style="font-size:18px;">الفروع</a>
@@ -254,7 +254,7 @@ $bodyCode   = $settings['body_code']   ?? '';
     </section>
     <section id="branches" class="branches-section">
       <div class="section-pattern-accent">
-        <img src="api/img.php?src=pattern-3.webp&w=800" alt="" aria-hidden="true" loading="lazy" />
+        <img src="api/img.php?src=pattern-3.webp&w=800" alt="" aria-hidden="true" loading="lazy" width="800" height="253" />
       </div>
       <div class="container" id="pranches">
         <div class="section-header">
@@ -270,7 +270,7 @@ $bodyCode   = $settings['body_code']   ?? '';
     </section>
     <section id="contact" class="contact-section">
       <div class="contact-bg-pattern">
-        <img src="api/img.php?src=pattern-4.webp&w=800" alt="" aria-hidden="true" loading="lazy" />
+        <img src="api/img.php?src=pattern-4.webp&w=800" alt="" aria-hidden="true" loading="lazy" width="800" height="253" />
       </div>
       <div class="container">
         <div class="contact-card" id="contact-card">
@@ -302,12 +302,12 @@ $bodyCode   = $settings['body_code']   ?? '';
         <div class="brands-grid" id="brands-grid"></div>
       </div>
       <div class="brands-pattern-bottom">
-        <img src="api/img.php?src=pattern-6.webp&w=800" alt="" aria-hidden="true" loading="lazy" />
+        <img src="api/img.php?src=pattern-6.webp&w=800" alt="" aria-hidden="true" loading="lazy" width="800" height="253" />
       </div>
     </section>
     <section id="articles" class="articles-section">
       <div class="section-pattern-accent">
-        <img src="api/img.php?src=pattern-3.webp&w=800" alt="" aria-hidden="true" loading="lazy" />
+        <img src="api/img.php?src=pattern-3.webp&w=800" alt="" aria-hidden="true" loading="lazy" width="800" height="253" />
       </div>
       <div class="container">
         <div class="section-header">
@@ -320,11 +320,11 @@ $bodyCode   = $settings['body_code']   ?? '';
     </section>
     <footer class="site-footer">
       <div class="footer-pattern">
-        <img src="api/img.php?src=pattern-5.webp&w=800" alt="" aria-hidden="true" loading="lazy" />
+        <img src="api/img.php?src=pattern-5.webp&w=800" alt="" aria-hidden="true" loading="lazy" width="800" height="253" />
       </div>
       <div class="container">
         <div class="footer-inner">
-          <img src="logob.webp" alt="مخازن العناية" class="footer-logo" loading="lazy" />
+          <img src="logob.webp" alt="مخازن العناية" class="footer-logo" loading="lazy" width="108" height="50" />
           <p class="footer-copy">© 2025 مخازن العناية. جميع الحقوق محفوظة.</p>
         </div>
       </div>
@@ -342,8 +342,10 @@ $bodyCode   = $settings['body_code']   ?? '';
         100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
       }
     </style>
+    <?php if (($settings['perf_animations'] ?? '1') !== '0'): ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <?php endif; ?>
     <script src="api/minify.php?f=assets/js/main.js" defer></script>
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WZSZSGPN" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </body>
